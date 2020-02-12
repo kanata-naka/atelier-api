@@ -147,4 +147,5 @@ def index():
                 "https://pbs.twimg.com/media/DQ0v93fVQAAyFWd?format=jpg&name=large"
         }]
     }]
-    return jsonify(data)
+    max = request.args.get('max', len(data), type=int)
+    return jsonify(data[0:max])

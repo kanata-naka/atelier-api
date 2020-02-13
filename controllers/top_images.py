@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify
 top_images = Blueprint('top_images', __name__)
 
 
-@top_images.route('/')
+@top_images.route('')
 def index():
     data = [{
         "description":

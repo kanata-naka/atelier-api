@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify
 articles = Blueprint('articles', __name__)
 
 
-@articles.route('/')
+@articles.route('')
 def index():
     data = [{
         "title":

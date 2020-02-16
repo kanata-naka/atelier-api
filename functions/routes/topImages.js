@@ -1,7 +1,8 @@
 const functions = require("firebase-functions")
 const config = require("config")
-const TopImageRepository = require("./repositories/TopImageRepository")
+const TopImageRepository = require("../repositories/TopImageRepository")
 
+// リージョン
 const FIREBASE_REGION = config.get("firebase.region")
 
 /**

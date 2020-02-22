@@ -20,10 +20,6 @@ exports.get = functions.region(FIREBASE_REGION).https.onCall(async () => {
 
 /**
  * イラストを登録する
- * @param files ファイル一覧
- * @param title タイトル
- * @param tags タグ一覧
- * @param description 説明
  */
 exports.create = functions.region(FIREBASE_REGION).https.onCall(async data => {
   try {
@@ -45,11 +41,6 @@ exports.create = functions.region(FIREBASE_REGION).https.onCall(async data => {
 
 /**
  * イラストを更新する
- * @param files ファイル一覧
- * @param title タイトル
- * @param images 画像一覧
- * @param tags タグ一覧
- * @param description 説明
  */
 exports.update = functions.region(FIREBASE_REGION).https.onCall(async data => {
   try {
@@ -80,11 +71,10 @@ exports.update = functions.region(FIREBASE_REGION).https.onCall(async data => {
 
 /**
  * イラストを削除する
- * @param id
  */
 exports.deleteById = functions
   .region(FIREBASE_REGION)
-  .https.onCall(async id => {
+  .https.onCall(async ({ id }) => {
     try {
       storage.deleteFiles(`arts/${id}`)
       await ArtRepository.deleteById(id)

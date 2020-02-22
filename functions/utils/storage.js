@@ -17,3 +17,31 @@ exports.getFileUrl = name => {
     )
   })
 }
+
+/**
+ * ストレージにファイルを保存する
+ * @param file 保存するファイル
+}* @param name ファイル名
+ */
+exports.saveFile = async (file, name) => {
+  const _file = bucket.file(name)
+  await _file.save(file.buffer)
+  await _file.setMetadata({ contentType: file.mimetype })
+}
+
+/**
+ * ストレージからファイルを削除する
+}* @param name ファイル名
+ */
+exports.deleteFile = async name => {
+  const file = bucket.file(name)
+  await file.delete()
+}
+
+/**
+ * ストレージからディレクトリとその配下のファイルを全て削除する
+ * @param directory ディレクトリ名
+ */
+exports.deleteFiles = async directory => {
+  await bucket.deleteFiles({ directory: directory })
+}

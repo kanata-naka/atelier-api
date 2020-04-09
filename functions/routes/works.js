@@ -10,7 +10,7 @@ const FIREBASE_REGION = config.get("firebase.region")
  */
 exports.get = functions.region(FIREBASE_REGION).https.onCall(async () => {
   try {
-    return await WorkRepository.get(condition)
+    return await WorkRepository.get()
   } catch (error) {
     console.error(error)
     throw error

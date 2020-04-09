@@ -10,8 +10,8 @@ admin.initializeApp({
 
 // api
 exports.api = {
-  // トップ画像
   topImages: require("./routes/topImages"),
+  // blog: require("./routes/blog"),
   works: require("./routes/works"),
   arts: require("./routes/arts")
 }

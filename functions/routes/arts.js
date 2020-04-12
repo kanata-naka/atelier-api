@@ -7,16 +7,43 @@ const ArtRepository = require("../repositories/ArtRepository")
 const FIREBASE_REGION = config.get("firebase.region")
 
 /**
- * イラスト一覧を取得する
+ * 全てのタグとその件数を取得する
  */
-exports.get = functions.region(FIREBASE_REGION).https.onCall(async () => {
+exports.getAllTagsInfo = functions.region(FIREBASE_REGION).https.onCall(async () => {
   try {
-    return await ArtRepository.get()
+    return await ArtRepository.getAllTagsInfo()
   } catch (error) {
     console.error(error)
     throw error
   }
 })
+
+/**
+ * イラスト一覧を取得する
+ */
+exports.get = functions.region(FIREBASE_REGION).https.onCall(async data => {
+  try {
+    const result = await ArtRepository.get(data)
+    return {
+      result,
+      fetchedAll: data && data.limit ? result.length < data.limit : false
+    }
+  } catch (error) {
+    console.error(error)
+    throw error
+  }
+})
+
+exports.getById = functions
+  .region(FIREBASE_REGION)
+  .https.onCall(async ({ id }) => {
+    try {
+      return await ArtRepository.getById(id)
+    } catch (error) {
+      console.error(error)
+      throw error
+    }
+  })
 
 /**
  * イラストを登録する

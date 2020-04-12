@@ -53,7 +53,9 @@ exports.update = functions.region(FIREBASE_REGION).https.onCall(async data => {
         storage.deleteFile(image.name)
         console.log(`Removed image file. ${image.name}`)
       }
-      if (topImage.thumbnailImage.name !== originalTopImage.thumbnailImage.name) {
+      if (
+        topImage.thumbnailImage.name !== originalTopImage.thumbnailImage.name
+      ) {
         // サムネイル画像を削除する
         storage.deleteFile(thumbnailImage.name)
         console.log(`Removed thumbnailImage file. ${thumbnailImage.name}`)

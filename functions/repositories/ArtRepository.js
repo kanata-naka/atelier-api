@@ -8,31 +8,43 @@ const now = async () => {
 }
 
 /**
- * イラスト一覧を取得する
+ * 全てのタグとその件数を取得する
  */
-exports.get = async () => {
-  // 作成日時の降順で取得する
-  const collection = await collectionRef.orderBy("createdAt", "desc").get()
-  let result = await Promise.all(
-    collection.docs.map(async document => {
-      const data = document.data()
-      return {
-        id: document.id,
-        title: data.title,
-        tags: data.tags,
-        images: await Promise.all(
-          data.images.map(async image => {
-            return {
-              ...image,
-              url: await storage.getFileUrl(image.name)
-            }
-          })
-        ),
-        description: data.description,
-        createdAt: data.createdAt._seconds,
-        updatedAt: data.updatedAt._seconds
+exports.getAllTagsInfo = async () => {
+  const snapshot = await collectionRef.orderBy("createdAt", "desc")
+    .select('tags').get()
+  const result = {}
+  snapshot.docs.map(document => {
+    const tags = [ ...document.data().tags ]
+    tags.forEach(tag => {
+      if (result[tag]) {
+        result[tag]++
+      } else {
+        result[tag] = 1
       }
     })
+  })
+  return result
+}
+
+/**
+ * イラスト一覧を取得する
+ */
+exports.get = async ({ tag, lastId, limit }) => {
+  // 作成日時の降順で取得する
+  let query = collectionRef.orderBy("createdAt", "desc")
+  if (tag) {
+    query = query.where("tags", "array-contains", tag)
+  }
+  if (lastId) {
+    query = query.startAfter(await collectionRef.doc(lastId).get())
+  }
+  if (limit) {
+    query = query.limit(limit)
+  }
+  const snapshot = await query.get()
+  let result = await Promise.all(
+    snapshot.docs.map(async document => await snapshotToResult(document))
   )
   return result
 }
@@ -42,13 +54,30 @@ exports.get = async () => {
  * @param id
  */
 exports.getById = async id => {
-  const document = await collectionRef.doc(id).get()
-  if (!document.exists) {
+  const snapshot = await collectionRef.doc(id).get()
+  if (!snapshot.exists) {
     return
   }
+  return await snapshotToResult(snapshot)
+}
+
+const snapshotToResult = async snapshot => {
+  const data = snapshot.data()
   return {
-    id: document.id,
-    ...document.data()
+    id: snapshot.id,
+    title: data.title,
+    tags: data.tags,
+    images: await Promise.all(
+      data.images.map(async image => {
+        return {
+          ...image,
+          url: await storage.getFileUrl(image.name)
+        }
+      })
+    ),
+    description: data.description,
+    createdAt: data.createdAt._seconds,
+    updatedAt: data.updatedAt._seconds
   }
 }
 

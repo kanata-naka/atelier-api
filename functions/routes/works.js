@@ -8,11 +8,25 @@ const FIREBASE_REGION = config.get("firebase.region")
 /**
  * 作品一覧を取得する
  */
-exports.get = functions.region(FIREBASE_REGION).https.onCall(async () => {
+exports.get = functions.region(FIREBASE_REGION).https.onCall(async data => {
   try {
-    return await WorkRepository.get()
+    return {
+      result: await WorkRepository.get(data),
+      total: await WorkRepository.count()
+    }
   } catch (error) {
     console.error(error)
     throw error
   }
 })
+
+exports.getById = functions
+  .region(FIREBASE_REGION)
+  .https.onCall(async ({ id }) => {
+    try {
+      return await WorkRepository.getById(id)
+    } catch (error) {
+      console.error(error)
+      throw error
+    }
+  })

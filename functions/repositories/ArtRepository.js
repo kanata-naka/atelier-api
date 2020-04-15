@@ -8,26 +8,6 @@ const now = async () => {
 }
 
 /**
- * 全てのタグとその件数を取得する
- */
-exports.getAllTagsInfo = async () => {
-  const snapshot = await collectionRef.orderBy("createdAt", "desc")
-    .select('tags').get()
-  const result = {}
-  snapshot.docs.map(document => {
-    const tags = [ ...document.data().tags ]
-    tags.forEach(tag => {
-      if (result[tag]) {
-        result[tag]++
-      } else {
-        result[tag] = 1
-      }
-    })
-  })
-  return result
-}
-
-/**
  * イラスト一覧を取得する
  */
 exports.get = async ({ tag, lastId, limit }) => {

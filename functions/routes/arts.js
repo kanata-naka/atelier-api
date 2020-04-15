@@ -7,18 +7,6 @@ const ArtRepository = require("../repositories/ArtRepository")
 const FIREBASE_REGION = config.get("firebase.region")
 
 /**
- * 全てのタグとその件数を取得する
- */
-exports.getAllTagsInfo = functions.region(FIREBASE_REGION).https.onCall(async () => {
-  try {
-    return await ArtRepository.getAllTagsInfo()
-  } catch (error) {
-    console.error(error)
-    throw error
-  }
-})
-
-/**
  * イラスト一覧を取得する
  */
 exports.get = functions.region(FIREBASE_REGION).https.onCall(async data => {

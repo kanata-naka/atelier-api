@@ -10,7 +10,7 @@ const FIREBASE_REGION = config.get("firebase.region")
  */
 exports.get = functions
   .region(FIREBASE_REGION)
-  .https.onCall(async ({category}) => {
+  .https.onCall(async ({ category }) => {
     try {
       return await TagInfoRepository.getTagInfo(category)
     } catch (error) {

@@ -11,8 +11,7 @@ const FIREBASE_REGION = config.get("firebase.region")
 exports.get = functions.region(FIREBASE_REGION).https.onCall(async data => {
   try {
     return {
-      result: await WorkRepository.get(data),
-      total: await WorkRepository.count()
+      result: await WorkRepository.get(data)
     }
   } catch (error) {
     console.error(error)
@@ -20,6 +19,9 @@ exports.get = functions.region(FIREBASE_REGION).https.onCall(async data => {
   }
 })
 
+/**
+ * 作品を取得する
+ */
 exports.getById = functions
   .region(FIREBASE_REGION)
   .https.onCall(async ({ id }) => {

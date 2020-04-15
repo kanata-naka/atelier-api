@@ -22,6 +22,9 @@ exports.get = functions.region(FIREBASE_REGION).https.onCall(async data => {
   }
 })
 
+/**
+ * イラストを取得する
+ */
 exports.getById = functions
   .region(FIREBASE_REGION)
   .https.onCall(async ({ id }) => {

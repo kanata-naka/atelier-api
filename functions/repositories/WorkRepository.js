@@ -3,27 +3,26 @@ const storage = require("../utils/storage")
 
 const collectionRef = admin.firestore().collection("works")
 
-exports.count = async () => {
-  const snapshot = await collectionRef.get()
-  return snapshot.size
-}
-
 /**
  * 作品一覧を取得する
  */
-exports.get = async ({ offset = 0, limit }) => {
+exports.get = async ({ limit }) => {
   // 作成日時の降順で取得する
-  const snapshot = await collectionRef.orderBy("createdAt", "desc").get()
+  let query = collectionRef.orderBy("createdAt", "desc")
+  if (limit) {
+    query = query.limit(limit)
+  }
+  const snapshot = await query.get()
   let result = await Promise.all(
     snapshot.docs.map(async document => await snapshotToResult(document))
   )
-  if (!limit) {
-    return result.slice(offset)
-  } else {
-    return result.slice(offset, offset + limit)
-  }
+  return result
 }
 
+/**
+ * 作品を取得する
+ * @param id
+ */
 exports.getById = async id => {
   const snapshot = await collectionRef.doc(id).get()
   if (!snapshot.exists) {

@@ -42,20 +42,21 @@ exports.aggregateTagInfo = async category => {
     .orderBy("createdAt", "desc")
     .select("tags")
     .get()
-  const result = {}
+  const info = []
   snapshot.docs.map(document => {
-    const tags = [...document.data().tags]
-    tags.forEach(tag => {
-      if (result[tag]) {
-        result[tag]++
+    const tagNames = [...document.data().tags]
+    tagNames.forEach(tagName => {
+      const tag = info.find(_tag => _tag.name === tagName)
+      if (tag) {
+        tag.count++
       } else {
-        result[tag] = 1
+        info.push({ name: tagName, count: 1 })
       }
     })
   })
   // タグ情報に登録する
   await collectionRef.doc(category).set({
-    info: result,
+    info,
     updatedAt: await now()
   })
 }

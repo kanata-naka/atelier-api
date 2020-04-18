@@ -6,9 +6,12 @@ const collectionRef = admin.firestore().collection("works")
 /**
  * 作品一覧を取得する
  */
-exports.get = async ({ limit }) => {
+exports.get = async ({ limit, pickupFlag }) => {
   // 作成日時の降順で取得する
   let query = collectionRef.orderBy("createdAt", "desc")
+  if (pickupFlag) {
+    query = query.where("pickupFlag", "==", true)
+  }
   if (limit) {
     query = query.limit(limit)
   }

@@ -10,11 +10,14 @@ const now = async () => {
 /**
  * イラスト一覧を取得する
  */
-exports.get = async ({ tag, lastId, limit }) => {
+exports.get = async ({ tag, lastId, limit, pickupFlag }) => {
   // 作成日時の降順で取得する
   let query = collectionRef.orderBy("createdAt", "desc")
   if (tag) {
     query = query.where("tags", "array-contains", tag)
+  }
+  if (pickupFlag) {
+    query = query.where("pickupFlag", "==", true)
   }
   if (lastId) {
     query = query.startAfter(await collectionRef.doc(lastId).get())

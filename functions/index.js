@@ -11,7 +11,7 @@ admin.initializeApp({
 // api
 exports.api = {
   topImages: require("./routes/topImages"),
-  // blog: require("./routes/blog"),
+  blog: require("./routes/blog"),
   tagInfo: require("./routes/tagInfo"),
   works: require("./routes/works"),
   arts: require("./routes/arts")

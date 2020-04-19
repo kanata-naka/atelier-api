@@ -1,27 +1,26 @@
 const config = require("config")
-const axios = require("axios")
+const rssParser = require("rss-parser")
+const parser = new rssParser({
+  customFields: {
+    item: [
+      ['media:thumbnail', 'mediaThumbnail'],
+    ]
+  }
+})
 
 /**
  * 記事一覧を取得する
  */
 exports.getArticles = async ({ page, limit }) => {
-  const response = await axios({
-    method: 'get',
-    url: `https://note.com/api/v2/creators/${config.get("note.username")}/contents`,
-    params: {
-      kind: "note",
-      page: page || 1,
-      disabled_pinned: false
-    }
-  })
-  let result = response.data.data.contents.map(content => {
-    const topImage = content.pictures.length ? {
-      url: content.pictures[0].url
+  const feed = await parser.parseURL(`https://note.com/${config.get("note.username")}/rss`)
+  let result = feed.items.map(item => {
+    const topImage = item.mediaThumbnail ? {
+      url: item.mediaThumbnail
     } : undefined
     return {
-      id: content.key,
-      title: content.name,
-      createdAt: content.publishAt,
+      url: item.link,
+      title: item.title,
+      createdAt: item.isoDate,
       topImage
     }
   })

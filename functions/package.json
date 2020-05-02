@@ -2,30 +2,36 @@
   "name": "atelier-api",
   "description": "",
   "scripts": {
-    "serve": "firebase serve --only functions:api",
-    "shell": "firebase functions:shell",
+    "lint": "tslint --project tsconfig.json",
+    "build": "tsc",
+    "serve": "npm run build && firebase serve --only functions:api",
+    "shell": "npm run build && firebase functions:shell",
     "start": "npm run shell",
     "deploy": "firebase deploy --only functions:api",
     "logs": "firebase functions:log",
-    "prettier": "prettier **/*.js --write"
+    "prettier": "prettier **/*.ts --write"
   },
   "engines": {
     "node": "10"
   },
+  "main": "lib/index.js",
   "dependencies": {
-    "config": "^3.2.5",
-    "firebase-admin": "~7.0.0",
-    "firebase-functions": "^2.3.0",
+    "@google-cloud/storage": "^4.7.0",
+    "@types/config": "0.0.36",
+    "@types/xml2js": "^0.4.5",
+    "config": "^3.3.1",
+    "firebase-admin": "^8.11.0",
+    "firebase-functions": "^3.6.0",
+    "reflect-metadata": "^0.1.13",
     "rss-parser": "^3.7.6",
-    "uuid": "^3.4.0"
+    "tsyringe": "^4.1.0",
+    "uuid": "^7.0.3"
   },
   "devDependencies": {
-    "firebase-functions-test": "^0.1.6",
-    "prettier": "^1.19.1"
+    "firebase-functions-test": "^0.2.1",
+    "prettier": "^2.0.5",
+    "tslint": "^5.12.0",
+    "typescript": "^3.2.2"
   },
-  "private": true,
-  "prettier": {
-    "semi": false,
-    "jsxBracketSameLine": true
-  }
+  "private": true
 }

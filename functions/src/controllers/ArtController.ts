@@ -102,7 +102,7 @@ export default class ArtController extends AbstractController {
    * @param data
    */
   public async deleteById(data: DeleteByIdData) {
-    this.storageUtil.deleteFiles(`arts/${data.id}`);
+    await this.storageUtil.deleteFiles(`arts/${data.id}`);
     await this.artRepository.deleteById(data.id);
   }
 }

@@ -62,7 +62,7 @@ export default abstract class AbstractRepository<T extends AbstractModel> {
     let batch = admin.firestore().batch();
     const snapshot = await this.collectionRef.get();
     let count = 0;
-    snapshot.docs.map((documentSnapshot, index) => {
+    await Promise.all(snapshot.docs.map(async (documentSnapshot, index) => {
       const model = models.find((_model) => documentSnapshot.id === _model.id);
       if (!model) {
         return;
@@ -70,7 +70,7 @@ export default abstract class AbstractRepository<T extends AbstractModel> {
       delete model.id;
       if (count === 500) {
         // 500件ごとにcommitしてbatchインスタンスを初期化する
-        batch.commit();
+        await batch.commit();
         batch = admin.firestore().batch();
         count = 0;
       }
@@ -79,8 +79,8 @@ export default abstract class AbstractRepository<T extends AbstractModel> {
         ...model,
       });
       count++;
-    });
-    batch.commit();
+    }));
+    await batch.commit();
   }
 
   /**
@@ -99,20 +99,20 @@ export default abstract class AbstractRepository<T extends AbstractModel> {
     let batch = admin.firestore().batch();
     const snapshot = await this.collectionRef.get();
     let count = 0;
-    snapshot.docs.map((documentSnapshot, index) => {
+    await Promise.all(snapshot.docs.map(async (documentSnapshot, index) => {
       if (!ids.find((id) => documentSnapshot.id === id)) {
         return;
       }
       if (count === 500) {
         // 500件ごとにcommitしてbatchインスタンスを初期化する
-        batch.commit();
+        await batch.commit();
         batch = admin.firestore().batch();
         count = 0;
       }
       batch.delete(documentSnapshot.ref);
       count++;
-    });
-    batch.commit();
+    }));
+    await batch.commit();
   }
 
   /**

@@ -96,7 +96,7 @@ export default class WorkController extends AbstractController {
    * @param data
    */
   public async deleteById(data: DeleteByIdData) {
-    this.storageUtil.deleteFiles(`arts/${data.id}`);
+    await this.storageUtil.deleteFiles(`arts/${data.id}`);
     await this.workRepository.deleteById(data.id);
   }
 }

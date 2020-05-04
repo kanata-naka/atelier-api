@@ -32,13 +32,13 @@ export const api = {
         return await topImageController.getById(data);
       }),
       create: functions.region(region).https.onCall(async (data) => {
-        return await topImageController.create(data);
+        await topImageController.create(data);
       }),
       bulkUpdate: functions.region(region).https.onCall(async (data) => {
-        return await topImageController.bulkUpdate(data);
+        await topImageController.bulkUpdate(data);
       }),
       deleteById: functions.region(region).https.onCall(async (data) => {
-        return await topImageController.deleteById(data);
+        await topImageController.deleteById(data);
       }),
     };
   })(),
@@ -68,13 +68,13 @@ export const api = {
         return await artController.getById(data);
       }),
       create: functions.region(region).https.onCall(async (data) => {
-        return await artController.create(data);
+        await artController.create(data);
       }),
       update: functions.region(region).https.onCall(async (data) => {
-        return await artController.update(data);
+        await artController.update(data);
       }),
       deleteById: functions.region(region).https.onCall(async (data) => {
-        return await artController.deleteById(data);
+        await artController.deleteById(data);
       }),
     };
   })(),
@@ -88,13 +88,13 @@ export const api = {
         return await workController.getById(data);
       }),
       create: functions.region(region).https.onCall(async (data) => {
-        return await workController.create(data);
+        await workController.create(data);
       }),
       update: functions.region(region).https.onCall(async (data) => {
-        return await workController.update(data);
+        await workController.update(data);
       }),
       deleteById: functions.region(region).https.onCall(async (data) => {
-        return await workController.deleteById(data);
+        await workController.deleteById(data);
       }),
     };
   })(),

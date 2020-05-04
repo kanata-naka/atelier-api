@@ -87,7 +87,7 @@ export default class TopImageController extends AbstractController {
    * @param data
    */
   public async deleteById(data: DeleteByIdData) {
-    this.storageUtil.deleteFiles(`topImages/${data.id}`);
+    await this.storageUtil.deleteFiles(`topImages/${data.id}`);
     await this.topImageRepository.deleteById(data.id);
   }
 }

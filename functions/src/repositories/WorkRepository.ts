@@ -18,7 +18,7 @@ export default class WorkRepository extends AbstractRepository<WorkModel> {
     // 作成日時の降順で取得する
     let query = this.collectionRef.orderBy("createdAt", "desc");
     if (condition.pickupFlag) {
-      // 条件：ピックアップ対象かどうか
+      // 条件：ピックアップフラグ
       query = query.where("pickupFlag", "==", true);
     }
     if (condition.limit) {

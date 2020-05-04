@@ -14,6 +14,8 @@ export default class ArtGetByIdResponse {
   }>;
   /** 説明 */
   description?: string;
+  /** ピックアップフラグ */
+  pickupFlag?: boolean;
   /** 作成日時 */
   createdAt?: number;
   /** 更新日時 */

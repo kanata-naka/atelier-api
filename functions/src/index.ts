@@ -31,13 +31,22 @@ export const api = {
       getById: functions.region(region).https.onCall(async (data) => {
         return await topImageController.getById(data);
       }),
+      create: functions.region(region).https.onCall(async (data) => {
+        return await topImageController.create(data);
+      }),
+      bulkUpdate: functions.region(region).https.onCall(async (data) => {
+        return await topImageController.bulkUpdate(data);
+      }),
+      deleteById: functions.region(region).https.onCall(async (data) => {
+        return await topImageController.deleteById(data);
+      }),
     };
   })(),
   blog: (() => {
     const blogController = container.resolve(BlogController);
     return {
       getArticles: functions.region(region).https.onCall(async (data) => {
-        return await blogController.getArticles(data)
+        return await blogController.getArticles(data);
       }),
     };
   })(),
@@ -45,7 +54,7 @@ export const api = {
     const tagInfoController = container.resolve(TagInfoController);
     return {
       getById: functions.region(region).https.onCall(async (data) => {
-        return await tagInfoController.getById(data)
+        return await tagInfoController.getById(data);
       }),
     };
   })(),
@@ -53,10 +62,19 @@ export const api = {
     const artController = container.resolve(ArtController);
     return {
       get: functions.region(region).https.onCall(async (data) => {
-        return await artController.get(data)
+        return await artController.get(data);
       }),
       getById: functions.region(region).https.onCall(async (data) => {
-        return await artController.getById(data)
+        return await artController.getById(data);
+      }),
+      create: functions.region(region).https.onCall(async (data) => {
+        return await artController.create(data);
+      }),
+      update: functions.region(region).https.onCall(async (data) => {
+        return await artController.update(data);
+      }),
+      deleteById: functions.region(region).https.onCall(async (data) => {
+        return await artController.deleteById(data);
       }),
     };
   })(),
@@ -64,10 +82,10 @@ export const api = {
     const workController = container.resolve(WorkController);
     return {
       get: functions.region(region).https.onCall(async (data) => {
-        return await workController.get(data)
+        return await workController.get(data);
       }),
       getById: functions.region(region).https.onCall(async (data) => {
-        return await workController.getById(data)
+        return await workController.getById(data);
       }),
     };
   })(),

@@ -22,7 +22,7 @@ export default class ArtRepository extends AbstractRepository<ArtModel> {
       query = query.where("tags", "array-contains", condition.tag);
     }
     if (condition.pickupFlag) {
-      // 条件：ピックアップ対象かどうか
+      // 条件：ピックアップフラグ
       query = query.where("pickupFlag", "==", true);
     }
     if (condition.lastId) {

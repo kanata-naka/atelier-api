@@ -4,7 +4,7 @@
 export default class ArtGetCondition {
   /** タグ */
   tag?: string;
-  /** ピックアップ対象かどうか */
+  /**  */
   pickupFlag?: boolean;
   /** 最後のID（自動スクロールで使用） */
   lastId?: string;

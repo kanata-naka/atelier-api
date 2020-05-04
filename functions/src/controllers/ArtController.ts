@@ -7,6 +7,9 @@ import StorageUtil from "../utils/StorageUtil";
 import ArtGetResponse from "../dto/ArtGetResponse";
 import ArtGetData from "../dto/ArtGetData";
 import GetByIdData from "../dto/GetByIdData";
+import ArtCreateData from "../dto/ArtCreateData";
+import ArtUpdateData from "../dto/ArtUpdateData";
+import DeleteByIdData from "../dto/DeleteByIdData";
 
 /**
  * アート（イラスト）のコントローラ
@@ -59,9 +62,35 @@ export default class ArtController extends AbstractController {
           };
         })
       ),
+      pickupFlag: model.pickupFlag,
       description: model.description,
       createdAt: model.createdAt?._seconds,
       updatedAt: model.updatedAt?._seconds,
     };
+  }
+
+  /**
+   * アート（イラスト）を登録する
+   * @param data
+   */
+  public async create(data: ArtCreateData) {
+    await this.artRepository.create(data);
+  }
+
+  /**
+   * アート（イラスト）を更新する
+   * @param data
+   */
+  public async update(data: ArtUpdateData) {
+    await this.artRepository.update(data);
+  }
+
+  /**
+   * IDに紐づくアート（イラスト）を削除する
+   * @param data
+   */
+  public async deleteById(data: DeleteByIdData) {
+    this.storageUtil.deleteFiles(`arts/${data.id}`);
+    await this.artRepository.deleteById(data.id);
   }
 }

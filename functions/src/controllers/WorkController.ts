@@ -57,6 +57,7 @@ export default class WorkController extends AbstractController {
         })
       ),
       description: model.description,
+      pickupFlag: model.pickupFlag,
       createdAt: model.createdAt?._seconds,
       updatedAt: model.updatedAt?._seconds,
     };

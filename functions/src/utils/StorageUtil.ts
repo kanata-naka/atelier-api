@@ -36,4 +36,12 @@ export default class StorageUtil {
       );
     });
   }
+
+  /**
+   * ストレージからディレクトリとその配下のファイルを全て削除する
+   * @param directory ディレクトリ名
+   */
+  public async deleteFiles(directory: string) {
+    await this.bucket.deleteFiles({ directory });
+  }
 }

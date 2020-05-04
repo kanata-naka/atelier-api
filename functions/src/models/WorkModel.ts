@@ -13,4 +13,6 @@ export default class WorkModel extends AbstractModel {
   }>;
   /** 説明 */
   description?: string;
+  /** ピックアップフラグ */
+  pickupFlag?: boolean = false;
 }

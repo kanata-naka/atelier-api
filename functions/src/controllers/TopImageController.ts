@@ -6,6 +6,9 @@ import TopImageRepository from "../repositories/TopImageRepository";
 import StorageUtil from "../utils/StorageUtil";
 import TopImageGetResponse from "../dto/TopImageGetResponse";
 import GetByIdData from "../dto/GetByIdData";
+import TopImageCreateData from "../dto/TopImageCreateData";
+import TopImageBulkUpdateData from "../dto/TopImageBulkUpdateData";
+import DeleteByIdData from "../dto/DeleteByIdData";
 
 /**
  * トップ画像のコントローラ
@@ -61,5 +64,30 @@ export default class TopImageController extends AbstractController {
       createdAt: model.createdAt?._seconds,
       updatedAt: model.updatedAt?._seconds,
     };
+  }
+
+  /**
+   * トップ画像を登録する
+   * @param data
+   */
+  public async create(data: TopImageCreateData) {
+    await this.topImageRepository.create(data);
+  }
+
+  /**
+   * トップ画像を一括で更新する
+   * @param data
+   */
+  public async bulkUpdate(data: TopImageBulkUpdateData) {
+    await this.topImageRepository.bulkUpdate(data);
+  }
+
+  /**
+   * IDに紐づくトップ画像を削除する
+   * @param data
+   */
+  public async deleteById(data: DeleteByIdData) {
+    this.storageUtil.deleteFiles(`topImages/${data.id}`);
+    await this.topImageRepository.deleteById(data.id);
   }
 }

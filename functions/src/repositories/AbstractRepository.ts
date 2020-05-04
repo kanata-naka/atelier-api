@@ -67,7 +67,6 @@ export default abstract class AbstractRepository<T extends AbstractModel> {
       if (!model) {
         return;
       }
-      console.log("model", model);
       delete model.id;
       if (count === 500) {
         // 500件ごとにcommitしてbatchインスタンスを初期化する

@@ -22,8 +22,8 @@ export default class TagInfoController extends AbstractController {
     const model: TagInfoModel = await this.tagInfoRepository.getById(data.id);
     return {
       info: model.info,
-      createdAt: model.createdAt?._seconds,
-      updatedAt: model.updatedAt?._seconds,
+      createdAt: model.createdAt?.seconds,
+      updatedAt: model.updatedAt?.seconds,
     };
   }
 }

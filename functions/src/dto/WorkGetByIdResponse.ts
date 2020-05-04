@@ -3,6 +3,8 @@ export default class WorkGetByIdResponse {
   id!: string;
   /** タイトル */
   title!: string;
+  /** 出版日 */
+  publishedDate?: number;
   /** 画像の一覧 */
   images!: Array<{
     /** ストレージ上のパス */

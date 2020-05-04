@@ -6,6 +6,8 @@ import AbstractModel from "./AbstractModel";
 export default class WorkModel extends AbstractModel {
   /** タイトル */
   title!: string;
+  /** 出版日 */
+  publishedDate?: FirebaseFirestore.Timestamp;
   /** 画像の一覧 */
   images!: Array<{
     /** ストレージ上のパス */

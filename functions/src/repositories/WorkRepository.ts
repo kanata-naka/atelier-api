@@ -15,8 +15,10 @@ export default class WorkRepository extends AbstractRepository<WorkModel> {
    * @param condition
    */
   public async get(condition: WorkGetCondition): Promise<Array<WorkModel>> {
-    // 作成日時の降順で取得する
-    let query = this.collectionRef.orderBy("createdAt", "desc");
+    let query = this.collectionRef.orderBy(
+      condition.sort?.column || "createdAt",
+      condition.sort?.order || "desc"
+    );
     if (condition.pickupFlag) {
       // 条件：ピックアップフラグ
       query = query.where("pickupFlag", "==", true);

@@ -1,8 +1,8 @@
-export default class ArtCreateData {
+export default class WorkCreateData {
   /** タイトル */
   title!: string;
-  /** タグの一覧 */
-  tags?: Array<string>;
+  /** 出版日 */
+  publishedDate!: number;
   /** 画像の一覧 */
   images!: Array<{
     /** ストレージ上のパス */
@@ -12,6 +12,4 @@ export default class ArtCreateData {
   description?: string;
   /** ピックアップフラグ */
   pickupFlag?: boolean = false;
-  /** 作成日時 */
-  createdAt?: number;
 }

@@ -61,8 +61,8 @@ export default class TopImageController extends AbstractController {
       },
       description: model.description,
       order: model.order,
-      createdAt: model.createdAt?._seconds,
-      updatedAt: model.updatedAt?._seconds,
+      createdAt: model.createdAt?.seconds,
+      updatedAt: model.updatedAt?.seconds,
     };
   }
 

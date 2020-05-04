@@ -64,8 +64,8 @@ export default class ArtController extends AbstractController {
       ),
       pickupFlag: model.pickupFlag,
       description: model.description,
-      createdAt: model.createdAt?._seconds,
-      updatedAt: model.updatedAt?._seconds,
+      createdAt: model.createdAt?.seconds,
+      updatedAt: model.updatedAt?.seconds,
     };
   }
 
@@ -74,7 +74,13 @@ export default class ArtController extends AbstractController {
    * @param data
    */
   public async create(data: ArtCreateData) {
-    await this.artRepository.create(data);
+    const model: ArtModel = {
+      ...data,
+      createdAt: data.createdAt
+        ? this.artRepository.createTimestamp(data.createdAt)
+        : undefined,
+    };
+    await this.artRepository.create(model);
   }
 
   /**
@@ -82,7 +88,13 @@ export default class ArtController extends AbstractController {
    * @param data
    */
   public async update(data: ArtUpdateData) {
-    await this.artRepository.update(data);
+    const model: ArtModel = {
+      ...data,
+      createdAt: data.createdAt
+        ? this.artRepository.createTimestamp(data.createdAt)
+        : undefined,
+    };
+    await this.artRepository.update(model);
   }
 
   /**

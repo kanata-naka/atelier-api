@@ -35,9 +35,9 @@ export default abstract class AbstractRepository<T extends AbstractModel> {
     const documentRef = this.collectionRef.doc(model.id || uuidv4());
     delete model.id;
     await documentRef.set({
-      ...model,
       createdAt: this.now,
       updatedAt: this.now,
+      ...model,
     });
   }
 
@@ -49,8 +49,8 @@ export default abstract class AbstractRepository<T extends AbstractModel> {
     const documentRef = this.collectionRef.doc(model.id!);
     delete model.id;
     await documentRef.update({
-      ...model,
       updatedAt: this.now,
+      ...model,
     });
   }
 
@@ -75,8 +75,8 @@ export default abstract class AbstractRepository<T extends AbstractModel> {
         count = 0;
       }
       batch.update(documentSnapshot.ref, {
-        ...model,
         updatedAt: this.now,
+        ...model,
       });
       count++;
     });
@@ -120,5 +120,13 @@ export default abstract class AbstractRepository<T extends AbstractModel> {
    */
   protected get now() {
     return admin.firestore.FieldValue.serverTimestamp();
+  }
+
+  /**
+   * UNIXタイムスタンプ（秒）から@code{Timestamp}オブジェクトを生成する
+   * @param seconds
+   */
+  public createTimestamp(seconds: number) {
+    return admin.firestore.Timestamp.fromMillis(seconds * 1000);
   }
 }

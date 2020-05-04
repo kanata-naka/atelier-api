@@ -1,3 +1,3 @@
-import ArtModel from "../models/ArtModel";
+import ArtCreateData from "./ArtCreateData";
 
-export default class ArtUpdateData extends ArtModel {}
+export default class ArtUpdateData extends ArtCreateData {}

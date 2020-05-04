@@ -20,28 +20,26 @@ admin.initializeApp({
     .collection(id)
     .orderBy("createdAt", "desc")
     .select("tags")
-    .get()
+    .get();
   const info: Array<{
-    name: string,
-    count: number
-  }> = []
-  snapshot.docs.map(documentSnapshot => {
-    const tagNames: string[] = [...documentSnapshot.data().tags]
-    tagNames.forEach(tagName => {
-      const tag = info.find(_tag => _tag.name === tagName)
+    name: string;
+    count: number;
+  }> = [];
+  snapshot.docs.map((documentSnapshot) => {
+    const tagNames: string[] = [...documentSnapshot.data().tags];
+    tagNames.forEach((tagName) => {
+      const tag = info.find((_tag) => _tag.name === tagName);
       if (tag) {
-        tag.count++
+        tag.count++;
       } else {
-        info.push({ name: tagName, count: 1 })
+        info.push({ name: tagName, count: 1 });
       }
-    })
-  })
-  // タグ情報に登録する
-  await admin
-    .firestore()
-    .collection("tagInfo").doc(id).set({
-      info,
-      updatedAt: admin.firestore.FieldValue.serverTimestamp()
     });
+  });
+  // タグ情報に登録する
+  await admin.firestore().collection("tagInfo").doc(id).set({
+    info,
+    updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+  });
   console.log("Process succeed.");
 })();

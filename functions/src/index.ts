@@ -87,6 +87,15 @@ export const api = {
       getById: functions.region(region).https.onCall(async (data) => {
         return await workController.getById(data);
       }),
+      create: functions.region(region).https.onCall(async (data) => {
+        return await workController.create(data);
+      }),
+      update: functions.region(region).https.onCall(async (data) => {
+        return await workController.update(data);
+      }),
+      deleteById: functions.region(region).https.onCall(async (data) => {
+        return await workController.deleteById(data);
+      }),
     };
   })(),
 };

@@ -7,6 +7,9 @@ import StorageUtil from "../utils/StorageUtil";
 import WorkGetResponse from "../dto/WorkGetResponse";
 import WorkGetData from "../dto/WorkGetData";
 import GetByIdData from "../dto/GetByIdData";
+import WorkUpdateData from "../dto/WorkUpdateData";
+import DeleteByIdData from "../dto/DeleteByIdData";
+import WorkCreateData from "../dto/WorkCreateData";
 
 /**
  * 作品のコントローラ
@@ -48,6 +51,7 @@ export default class WorkController extends AbstractController {
     return {
       id: model.id!,
       title: model.title,
+      publishedDate: model.publishedDate?.seconds,
       images: await Promise.all(
         model.images.map(async (image) => {
           return {
@@ -58,8 +62,41 @@ export default class WorkController extends AbstractController {
       ),
       description: model.description,
       pickupFlag: model.pickupFlag,
-      createdAt: model.createdAt?._seconds,
-      updatedAt: model.updatedAt?._seconds,
+      createdAt: model.createdAt?.seconds,
+      updatedAt: model.updatedAt?.seconds,
     };
+  }
+
+  /**
+   * 作品を登録する
+   * @param data
+   */
+  public async create(data: WorkCreateData) {
+    const model: WorkModel = {
+      ...data,
+      publishedDate: this.workRepository.createTimestamp(data.publishedDate),
+    };
+    await this.workRepository.create(model);
+  }
+
+  /**
+   * 作品を更新する
+   * @param data
+   */
+  public async update(data: WorkUpdateData) {
+    const model: WorkModel = {
+      ...data,
+      publishedDate: this.workRepository.createTimestamp(data.publishedDate),
+    };
+    await this.workRepository.update(model);
+  }
+
+  /**
+   * IDに紐づく作品を削除する
+   * @param data
+   */
+  public async deleteById(data: DeleteByIdData) {
+    this.storageUtil.deleteFiles(`arts/${data.id}`);
+    await this.workRepository.deleteById(data.id);
   }
 }

@@ -62,24 +62,28 @@ export default abstract class AbstractRepository<T extends AbstractModel> {
     let batch = admin.firestore().batch();
     const snapshot = await this.collectionRef.get();
     let count = 0;
-    await Promise.all(snapshot.docs.map(async (documentSnapshot, index) => {
-      const model = models.find((_model) => documentSnapshot.id === _model.id);
-      if (!model) {
-        return;
-      }
-      delete model.id;
-      if (count === 500) {
-        // 500件ごとにcommitしてbatchインスタンスを初期化する
-        await batch.commit();
-        batch = admin.firestore().batch();
-        count = 0;
-      }
-      batch.update(documentSnapshot.ref, {
-        updatedAt: this.now,
-        ...model,
-      });
-      count++;
-    }));
+    await Promise.all(
+      snapshot.docs.map(async (documentSnapshot, index) => {
+        const model = models.find(
+          (_model) => documentSnapshot.id === _model.id
+        );
+        if (!model) {
+          return;
+        }
+        delete model.id;
+        if (count === 500) {
+          // 500件ごとにcommitしてbatchインスタンスを初期化する
+          await batch.commit();
+          batch = admin.firestore().batch();
+          count = 0;
+        }
+        batch.update(documentSnapshot.ref, {
+          updatedAt: this.now,
+          ...model,
+        });
+        count++;
+      })
+    );
     await batch.commit();
   }
 
@@ -99,19 +103,21 @@ export default abstract class AbstractRepository<T extends AbstractModel> {
     let batch = admin.firestore().batch();
     const snapshot = await this.collectionRef.get();
     let count = 0;
-    await Promise.all(snapshot.docs.map(async (documentSnapshot, index) => {
-      if (!ids.find((id) => documentSnapshot.id === id)) {
-        return;
-      }
-      if (count === 500) {
-        // 500件ごとにcommitしてbatchインスタンスを初期化する
-        await batch.commit();
-        batch = admin.firestore().batch();
-        count = 0;
-      }
-      batch.delete(documentSnapshot.ref);
-      count++;
-    }));
+    await Promise.all(
+      snapshot.docs.map(async (documentSnapshot, index) => {
+        if (!ids.find((id) => documentSnapshot.id === id)) {
+          return;
+        }
+        if (count === 500) {
+          // 500件ごとにcommitしてbatchインスタンスを初期化する
+          await batch.commit();
+          batch = admin.firestore().batch();
+          count = 0;
+        }
+        batch.delete(documentSnapshot.ref);
+        count++;
+      })
+    );
     await batch.commit();
   }
 

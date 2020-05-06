@@ -10,6 +10,7 @@ import GetByIdData from "../dto/GetByIdData";
 import ArtCreateData from "../dto/ArtCreateData";
 import ArtUpdateData from "../dto/ArtUpdateData";
 import DeleteByIdData from "../dto/DeleteByIdData";
+import TagInfoRepository from "../repositories/TagInfoRepository";
 
 /**
  * アート（イラスト）のコントローラ
@@ -18,6 +19,7 @@ import DeleteByIdData from "../dto/DeleteByIdData";
 export default class ArtController extends AbstractController {
   constructor(
     private artRepository: ArtRepository,
+    private tagInfoRepository: TagInfoRepository,
     private storageUtil: StorageUtil
   ) {
     super();
@@ -81,6 +83,8 @@ export default class ArtController extends AbstractController {
         : undefined,
     };
     await this.artRepository.create(model);
+    // タグ情報を更新する
+    await this.tagInfoRepository.aggregateById("arts");
   }
 
   /**
@@ -95,6 +99,8 @@ export default class ArtController extends AbstractController {
         : undefined,
     };
     await this.artRepository.update(model);
+    // タグ情報を更新する
+    await this.tagInfoRepository.aggregateById("arts");
   }
 
   /**
@@ -104,5 +110,7 @@ export default class ArtController extends AbstractController {
   public async deleteById(data: DeleteByIdData) {
     await this.storageUtil.deleteFiles(`arts/${data.id}`);
     await this.artRepository.deleteById(data.id);
+    // タグ情報を更新する
+    await this.tagInfoRepository.aggregateById("arts");
   }
 }

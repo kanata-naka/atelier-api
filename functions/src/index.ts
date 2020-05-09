@@ -9,6 +9,7 @@ import ArtController from "./controllers/ArtController";
 import WorkController from "./controllers/WorkController";
 import TopImageController from "./controllers/TopImageController";
 import BlogController from "./controllers/BlogController";
+import { HttpsError } from "firebase-functions/lib/providers/https";
 
 // Firebase Admin SDK を初期化する
 admin.initializeApp({
@@ -19,6 +20,17 @@ admin.initializeApp({
 
 /** リージョン */
 const region: typeof SUPPORTED_REGIONS[number] = config.get("firebase.region");
+
+const hasAdminUserClaim = async (context: functions.https.CallableContext) => {
+  if (!context.auth) {
+    return false;
+  }
+  const user = await admin.auth().getUser(context.auth.uid);
+  if (!user.customClaims || !(user.customClaims as { admin: boolean }).admin) {
+    return false;
+  }
+  return true;
+};
 
 // api
 export const api = {
@@ -31,15 +43,28 @@ export const api = {
       getById: functions.region(region).https.onCall(async (data) => {
         return await topImageController.getById(data);
       }),
-      create: functions.region(region).https.onCall(async (data) => {
+      create: functions.region(region).https.onCall(async (data, context) => {
+        if (!(await hasAdminUserClaim(context))) {
+          throw new HttpsError("unauthenticated", "");
+        }
         await topImageController.create(data);
       }),
-      bulkUpdate: functions.region(region).https.onCall(async (data) => {
-        await topImageController.bulkUpdate(data);
-      }),
-      deleteById: functions.region(region).https.onCall(async (data) => {
-        await topImageController.deleteById(data);
-      }),
+      bulkUpdate: functions
+        .region(region)
+        .https.onCall(async (data, context) => {
+          if (!(await hasAdminUserClaim(context))) {
+            throw new HttpsError("unauthenticated", "");
+          }
+          await topImageController.bulkUpdate(data);
+        }),
+      deleteById: functions
+        .region(region)
+        .https.onCall(async (data, context) => {
+          if (!(await hasAdminUserClaim(context))) {
+            throw new HttpsError("unauthenticated", "");
+          }
+          await topImageController.deleteById(data);
+        }),
     };
   })(),
   blog: (() => {
@@ -67,15 +92,26 @@ export const api = {
       getById: functions.region(region).https.onCall(async (data) => {
         return await artController.getById(data);
       }),
-      create: functions.region(region).https.onCall(async (data) => {
+      create: functions.region(region).https.onCall(async (data, context) => {
+        if (!(await hasAdminUserClaim(context))) {
+          throw new HttpsError("unauthenticated", "");
+        }
         await artController.create(data);
       }),
-      update: functions.region(region).https.onCall(async (data) => {
+      update: functions.region(region).https.onCall(async (data, context) => {
+        if (!(await hasAdminUserClaim(context))) {
+          throw new HttpsError("unauthenticated", "");
+        }
         await artController.update(data);
       }),
-      deleteById: functions.region(region).https.onCall(async (data) => {
-        await artController.deleteById(data);
-      }),
+      deleteById: functions
+        .region(region)
+        .https.onCall(async (data, context) => {
+          if (!(await hasAdminUserClaim(context))) {
+            throw new HttpsError("unauthenticated", "");
+          }
+          await artController.deleteById(data);
+        }),
     };
   })(),
   works: (() => {
@@ -87,15 +123,50 @@ export const api = {
       getById: functions.region(region).https.onCall(async (data) => {
         return await workController.getById(data);
       }),
-      create: functions.region(region).https.onCall(async (data) => {
+      create: functions.region(region).https.onCall(async (data, context) => {
+        if (!(await hasAdminUserClaim(context))) {
+          throw new HttpsError("unauthenticated", "");
+        }
         await workController.create(data);
       }),
-      update: functions.region(region).https.onCall(async (data) => {
+      update: functions.region(region).https.onCall(async (data, context) => {
+        if (!(await hasAdminUserClaim(context))) {
+          throw new HttpsError("unauthenticated", "");
+        }
         await workController.update(data);
       }),
-      deleteById: functions.region(region).https.onCall(async (data) => {
-        await workController.deleteById(data);
-      }),
+      deleteById: functions
+        .region(region)
+        .https.onCall(async (data, context) => {
+          if (!(await hasAdminUserClaim(context))) {
+            throw new HttpsError("unauthenticated", "");
+          }
+          await workController.deleteById(data);
+        }),
+    };
+  })(),
+  adminUsers: (() => {
+    return {
+      onCreate: functions.firestore
+        .document("admin_users/{documentId}")
+        .onCreate(async (snapshot) => {
+          const adminUser = snapshot.data();
+          if (adminUser) {
+            await admin
+              .auth()
+              .setCustomUserClaims(adminUser.uid, { admin: true });
+          }
+        }),
+      onDelete: functions.firestore
+        .document("admin_users/{documentId}")
+        .onDelete(async (snapshot) => {
+          const adminUser = snapshot.data();
+          if (adminUser) {
+            await admin
+              .auth()
+              .setCustomUserClaims(adminUser.uid, { admin: false });
+          }
+        }),
     };
   })(),
 };

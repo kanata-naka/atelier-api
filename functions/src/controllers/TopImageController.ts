@@ -1,4 +1,5 @@
 import { injectable } from "tsyringe";
+import * as functions from "firebase-functions";
 import TopImageModel from "../models/TopImageModel";
 import TopImageGetByIdResponse from "../dto/TopImageGetByIdResponse";
 import AbstractController from "./AbstractController";
@@ -15,6 +16,10 @@ import DeleteByIdData from "../dto/DeleteByIdData";
  */
 @injectable()
 export default class TopImageController extends AbstractController {
+  private static readonly IMAGE_MAX_WIDTH: number = 2000;
+  private static readonly IMAGE_MAX_HEIGHT: number = 1200;
+  private static readonly THUMBNAIL_IMAGE_MAX_WIDTH: number = 32;
+
   constructor(
     private topImageRepository: TopImageRepository,
     private storageUtil: StorageUtil
@@ -89,5 +94,43 @@ export default class TopImageController extends AbstractController {
   public async deleteById(data: DeleteByIdData) {
     await this.storageUtil.deleteFiles(`topImages/${data.id}`);
     await this.topImageRepository.deleteById(data.id);
+  }
+
+  public async onUploadImageFile(object: functions.storage.ObjectMetadata) {
+    if (
+      !object.name ||
+      !object.name?.match(/topImages\/(.+?)\/images\/(.+)/g)
+    ) {
+      return;
+    }
+    if (Number(object.metageneration) > 1) {
+      return;
+    }
+    return await this.storageUtil.resizeImageFile(
+      object,
+      object.name,
+      TopImageController.IMAGE_MAX_WIDTH,
+      TopImageController.IMAGE_MAX_HEIGHT
+    );
+  }
+
+  public async onUploadThumbnailImageFile(
+    object: functions.storage.ObjectMetadata
+  ) {
+    if (
+      !object.name ||
+      !object.name?.match(/topImages\/(.+?)\/thumbnailImages\/(.+)/g)
+    ) {
+      return;
+    }
+    if (Number(object.metageneration) > 1) {
+      return;
+    }
+    return await this.storageUtil.resizeImageFile(
+      object,
+      object.name,
+      TopImageController.THUMBNAIL_IMAGE_MAX_WIDTH,
+      TopImageController.THUMBNAIL_IMAGE_MAX_WIDTH
+    );
   }
 }

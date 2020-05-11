@@ -1,4 +1,5 @@
 import { injectable } from "tsyringe";
+import * as functions from "firebase-functions";
 import ArtModel from "../models/ArtModel";
 import ArtGetByIdResponse from "../dto/ArtGetByIdResponse";
 import AbstractController from "./AbstractController";
@@ -17,6 +18,8 @@ import TagInfoRepository from "../repositories/TagInfoRepository";
  */
 @injectable()
 export default class ArtController extends AbstractController {
+  private static readonly IMAGE_MAX_WIDTH: number = 1600;
+
   constructor(
     private artRepository: ArtRepository,
     private tagInfoRepository: TagInfoRepository,
@@ -112,5 +115,20 @@ export default class ArtController extends AbstractController {
     await this.artRepository.deleteById(data.id);
     // タグ情報を更新する
     await this.tagInfoRepository.aggregateById("arts");
+  }
+
+  public async onUploadImageFile(object: functions.storage.ObjectMetadata) {
+    if (!object.name || !object.name?.match(/arts\/(.+?)\/images\/(.+)/g)) {
+      return;
+    }
+    if (Number(object.metageneration) > 1) {
+      return;
+    }
+    return await this.storageUtil.resizeImageFile(
+      object,
+      object.name,
+      ArtController.IMAGE_MAX_WIDTH,
+      ArtController.IMAGE_MAX_WIDTH
+    );
   }
 }

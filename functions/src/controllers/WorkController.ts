@@ -1,4 +1,5 @@
 import { injectable } from "tsyringe";
+import * as functions from "firebase-functions";
 import WorkModel from "../models/WorkModel";
 import WorkGetByIdResponse from "../dto/WorkGetByIdResponse";
 import AbstractController from "./AbstractController";
@@ -16,6 +17,8 @@ import WorkCreateData from "../dto/WorkCreateData";
  */
 @injectable()
 export default class WorkController extends AbstractController {
+  private static readonly IMAGE_MAX_WIDTH: number = 1600;
+
   constructor(
     private workRepository: WorkRepository,
     private storageUtil: StorageUtil
@@ -98,5 +101,20 @@ export default class WorkController extends AbstractController {
   public async deleteById(data: DeleteByIdData) {
     await this.storageUtil.deleteFiles(`arts/${data.id}`);
     await this.workRepository.deleteById(data.id);
+  }
+
+  public async onUploadImageFile(object: functions.storage.ObjectMetadata) {
+    if (!object.name || !object.name?.match(/works\/(.+?)\/images\/(.+)/g)) {
+      return;
+    }
+    if (Number(object.metageneration) > 1) {
+      return;
+    }
+    return await this.storageUtil.resizeImageFile(
+      object,
+      object.name,
+      WorkController.IMAGE_MAX_WIDTH,
+      WorkController.IMAGE_MAX_WIDTH
+    );
   }
 }

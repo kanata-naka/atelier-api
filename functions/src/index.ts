@@ -65,6 +65,18 @@ export const api = {
           }
           await topImageController.deleteById(data);
         }),
+      onUploadImageFile: functions
+        .region(region)
+        .storage.object()
+        .onFinalize(async (object) => {
+          await topImageController.onUploadImageFile(object);
+        }),
+      onUploadThumbnailImageFile: functions
+        .region(region)
+        .storage.object()
+        .onFinalize(async (object) => {
+          await topImageController.onUploadThumbnailImageFile(object);
+        }),
     };
   })(),
   blog: (() => {
@@ -112,6 +124,12 @@ export const api = {
           }
           await artController.deleteById(data);
         }),
+      onUploadImageFile: functions
+        .region(region)
+        .storage.object()
+        .onFinalize(async (object) => {
+          await artController.onUploadImageFile(object);
+        }),
     };
   })(),
   works: (() => {
@@ -143,12 +161,19 @@ export const api = {
           }
           await workController.deleteById(data);
         }),
+      onUploadImageFile: functions
+        .region(region)
+        .storage.object()
+        .onFinalize(async (object) => {
+          await workController.onUploadImageFile(object);
+        }),
     };
   })(),
   adminUsers: (() => {
     return {
-      onCreate: functions.firestore
-        .document("admin_users/{documentId}")
+      onCreate: functions
+        .region(region)
+        .firestore.document("admin_users/{documentId}")
         .onCreate(async (snapshot) => {
           const adminUser = snapshot.data();
           if (adminUser) {
@@ -157,8 +182,9 @@ export const api = {
               .setCustomUserClaims(adminUser.uid, { admin: true });
           }
         }),
-      onDelete: functions.firestore
-        .document("admin_users/{documentId}")
+      onDelete: functions
+        .region(region)
+        .firestore.document("admin_users/{documentId}")
         .onDelete(async (snapshot) => {
           const adminUser = snapshot.data();
           if (adminUser) {

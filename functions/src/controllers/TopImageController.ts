@@ -97,18 +97,8 @@ export default class TopImageController extends AbstractController {
   }
 
   public async onUploadImageFile(object: functions.storage.ObjectMetadata) {
-    if (
-      !object.name ||
-      !object.name?.match(/topImages\/(.+?)\/images\/(.+)/g)
-    ) {
-      return;
-    }
-    if (Number(object.metageneration) > 1) {
-      return;
-    }
     return await this.storageUtil.resizeImageFile(
       object,
-      object.name,
       TopImageController.IMAGE_MAX_WIDTH,
       TopImageController.IMAGE_MAX_HEIGHT
     );
@@ -117,18 +107,8 @@ export default class TopImageController extends AbstractController {
   public async onUploadThumbnailImageFile(
     object: functions.storage.ObjectMetadata
   ) {
-    if (
-      !object.name ||
-      !object.name?.match(/topImages\/(.+?)\/thumbnailImages\/(.+)/g)
-    ) {
-      return;
-    }
-    if (Number(object.metageneration) > 1) {
-      return;
-    }
     return await this.storageUtil.resizeImageFile(
       object,
-      object.name,
       TopImageController.THUMBNAIL_IMAGE_MAX_WIDTH,
       TopImageController.THUMBNAIL_IMAGE_MAX_WIDTH
     );

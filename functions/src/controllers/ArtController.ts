@@ -118,15 +118,8 @@ export default class ArtController extends AbstractController {
   }
 
   public async onUploadImageFile(object: functions.storage.ObjectMetadata) {
-    if (!object.name || !object.name?.match(/arts\/(.+?)\/images\/(.+)/g)) {
-      return;
-    }
-    if (Number(object.metageneration) > 1) {
-      return;
-    }
     return await this.storageUtil.resizeImageFile(
       object,
-      object.name,
       ArtController.IMAGE_MAX_WIDTH,
       ArtController.IMAGE_MAX_WIDTH
     );

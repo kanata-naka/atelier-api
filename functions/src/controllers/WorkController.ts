@@ -104,15 +104,8 @@ export default class WorkController extends AbstractController {
   }
 
   public async onUploadImageFile(object: functions.storage.ObjectMetadata) {
-    if (!object.name || !object.name?.match(/works\/(.+?)\/images\/(.+)/g)) {
-      return;
-    }
-    if (Number(object.metageneration) > 1) {
-      return;
-    }
     return await this.storageUtil.resizeImageFile(
       object,
-      object.name,
       WorkController.IMAGE_MAX_WIDTH,
       WorkController.IMAGE_MAX_WIDTH
     );

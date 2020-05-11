@@ -65,18 +65,6 @@ export const api = {
           }
           await topImageController.deleteById(data);
         }),
-      onUploadImageFile: functions
-        .region(region)
-        .storage.object()
-        .onFinalize(async (object) => {
-          await topImageController.onUploadImageFile(object);
-        }),
-      onUploadThumbnailImageFile: functions
-        .region(region)
-        .storage.object()
-        .onFinalize(async (object) => {
-          await topImageController.onUploadThumbnailImageFile(object);
-        }),
     };
   })(),
   blog: (() => {
@@ -124,12 +112,6 @@ export const api = {
           }
           await artController.deleteById(data);
         }),
-      onUploadImageFile: functions
-        .region(region)
-        .storage.object()
-        .onFinalize(async (object) => {
-          await artController.onUploadImageFile(object);
-        }),
     };
   })(),
   works: (() => {
@@ -161,12 +143,6 @@ export const api = {
           }
           await workController.deleteById(data);
         }),
-      onUploadImageFile: functions
-        .region(region)
-        .storage.object()
-        .onFinalize(async (object) => {
-          await workController.onUploadImageFile(object);
-        }),
     };
   })(),
   adminUsers: (() => {
@@ -191,6 +167,30 @@ export const api = {
             await admin
               .auth()
               .setCustomUserClaims(adminUser.uid, { admin: false });
+          }
+        }),
+    };
+  })(),
+  storage: (() => {
+    return {
+      onUploadFile: functions
+        .region(region)
+        .storage.object()
+        .onFinalize(async (object) => {
+          const topImageController = container.resolve(TopImageController);
+          const artController = container.resolve(ArtController);
+          const workController = container.resolve(WorkController);
+
+          if (object.name?.match(/topImages\/(.+?)\/image\/(.+)/g)) {
+            await topImageController.onUploadImageFile(object);
+          } else if (
+            object.name?.match(/topImages\/(.+?)\/thumbnailImage\/(.+)/g)
+          ) {
+            await topImageController.onUploadThumbnailImageFile(object);
+          } else if (object.name?.match(/arts\/(.+?)\/images\/(.+)/g)) {
+            await artController.onUploadImageFile(object);
+          } else if (object.name?.match(/works\/(.+?)\/images\/(.+)/g)) {
+            await workController.onUploadImageFile(object);
           }
         }),
     };

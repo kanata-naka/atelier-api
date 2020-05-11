@@ -55,18 +55,23 @@ export default class StorageUtil {
    */
   public resizeImageFile(
     object: functions.storage.ObjectMetadata,
-    name: string,
     maxWidth: number,
     maxHeight: number
   ) {
+    const name = object.name!;
     const contentType = object.contentType;
     if (!contentType?.startsWith("image/")) {
       console.warn(`"${name}" is not an image.`);
       return null;
     }
+    if (object.metadata && object.metadata.resized) {
+      console.log(`"${name}" has already been resized.`);
+      return null;
+    }
     const bucket = admin.storage().bucket(object.bucket);
     const metadata = {
       contentType: contentType,
+      resized: "true",
     };
     const stream = bucket.file(name).createWriteStream({ metadata });
     const pipeline = sharp();

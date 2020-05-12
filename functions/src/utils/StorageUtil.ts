@@ -58,33 +58,43 @@ export default class StorageUtil {
     maxWidth: number,
     maxHeight: number
   ) {
-    const name = object.name!;
-    const contentType = object.contentType;
-    if (!contentType?.startsWith("image/")) {
-      console.warn(`"${name}" is not an image.`);
-      return null;
-    }
-    if (object.metadata && object.metadata.resized) {
-      console.log(`"${name}" has already been resized.`);
-      return null;
-    }
-    const bucket = admin.storage().bucket(object.bucket);
-    const metadata = {
-      contentType: contentType,
-      resized: "true",
-    };
-    const stream = bucket.file(name).createWriteStream({ metadata });
-    const pipeline = sharp();
-    pipeline
-      .resize({
-        width: maxWidth,
-        height: maxHeight,
-        fit: "inside",
-      })
-      .pipe(stream);
-    bucket.file(name).createReadStream().pipe(pipeline);
-    return new Promise((resolve, reject) =>
-      stream.on("finish", resolve).on("error", reject)
-    );
+    return new Promise((resolve, reject) => {
+      const name = object.name!;
+      const contentType = object.contentType;
+      if (!contentType?.startsWith("image/")) {
+        console.warn(`"${name}" is not an image.`);
+        resolve();
+      }
+      const bucket = admin.storage().bucket(object.bucket);
+      const stream = bucket.file(name).createWriteStream({
+        metadata: {
+          contentType: contentType,
+        },
+      });
+      const pipeline = sharp();
+      pipeline
+        .metadata()
+        .then((data) => {
+          if (
+            data.width &&
+            data.width <= maxWidth &&
+            data.height &&
+            data.height <= maxHeight
+          ) {
+            console.log(`"${name}" has not need to resize.`);
+            resolve();
+          }
+          pipeline
+            .resize({
+              width: maxWidth,
+              height: maxHeight,
+              fit: "inside",
+            })
+            .pipe(stream);
+        })
+        .catch(reject);
+      bucket.file(name).createReadStream().pipe(pipeline);
+      stream.on("finish", resolve).on("error", reject);
+    });
   }
 }

@@ -174,6 +174,7 @@ export const api = {
   storage: (() => {
     return {
       onUploadFile: functions
+        .runWith({ memory: "512MB" })
         .region(region)
         .storage.object()
         .onFinalize(async (object) => {

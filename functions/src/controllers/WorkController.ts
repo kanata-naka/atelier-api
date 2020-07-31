@@ -17,7 +17,7 @@ import WorkCreateData from "../dto/WorkCreateData";
  */
 @injectable()
 export default class WorkController extends AbstractController {
-  private static readonly IMAGE_MAX_WIDTH: number = 1600;
+  private static readonly IMAGE_SMALL_MAX_WIDTH: number = 64;
 
   constructor(
     private workRepository: WorkRepository,
@@ -127,10 +127,19 @@ export default class WorkController extends AbstractController {
   }
 
   public async onUploadImageFile(object: functions.storage.ObjectMetadata) {
+    if (object.name!.includes("_small")) {
+      return;
+    }
+    if (!this.storageUtil.isImageFile(object)) {
+      return;
+    }
+    // サムネイル画像（小）を生成する
     return await this.storageUtil.resizeImageFile(
       object,
-      WorkController.IMAGE_MAX_WIDTH,
-      WorkController.IMAGE_MAX_WIDTH
+      WorkController.IMAGE_SMALL_MAX_WIDTH,
+      WorkController.IMAGE_SMALL_MAX_WIDTH,
+      "inside",
+      this.storageUtil.getThumbnailImageName(object.name!, "_small")
     );
   }
 }

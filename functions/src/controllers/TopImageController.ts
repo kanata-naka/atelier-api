@@ -16,8 +16,8 @@ import DeleteByIdData from "../dto/DeleteByIdData";
  */
 @injectable()
 export default class TopImageController extends AbstractController {
-  private static readonly IMAGE_MAX_WIDTH: number = 2000;
-  private static readonly IMAGE_MAX_HEIGHT: number = 1200;
+  private static readonly IMAGE_MAX_WIDTH: number = 1920;
+  private static readonly IMAGE_MAX_HEIGHT: number = 1152;
   private static readonly THUMBNAIL_IMAGE_MAX_WIDTH: number = 32;
 
   constructor(
@@ -116,20 +116,46 @@ export default class TopImageController extends AbstractController {
   }
 
   public async onUploadImageFile(object: functions.storage.ObjectMetadata) {
+    if (
+      !this.storageUtil.isImageFile(object) ||
+      !(await this.storageUtil.needToResizeImageFile(
+        object,
+        TopImageController.IMAGE_MAX_WIDTH,
+        TopImageController.IMAGE_MAX_HEIGHT,
+        "cover"
+      ))
+    ) {
+      return;
+    }
+    // 画像をリサイズする
     return await this.storageUtil.resizeImageFile(
       object,
       TopImageController.IMAGE_MAX_WIDTH,
-      TopImageController.IMAGE_MAX_HEIGHT
+      TopImageController.IMAGE_MAX_HEIGHT,
+      "cover"
     );
   }
 
   public async onUploadThumbnailImageFile(
     object: functions.storage.ObjectMetadata
   ) {
+    if (
+      !this.storageUtil.isImageFile(object) ||
+      !(await this.storageUtil.needToResizeImageFile(
+        object,
+        TopImageController.THUMBNAIL_IMAGE_MAX_WIDTH,
+        TopImageController.THUMBNAIL_IMAGE_MAX_WIDTH,
+        "cover"
+      ))
+    ) {
+      return;
+    }
+    // サムネイル画像をリサイズする
     return await this.storageUtil.resizeImageFile(
       object,
       TopImageController.THUMBNAIL_IMAGE_MAX_WIDTH,
-      TopImageController.THUMBNAIL_IMAGE_MAX_WIDTH
+      TopImageController.THUMBNAIL_IMAGE_MAX_WIDTH,
+      "cover"
     );
   }
 }

@@ -18,7 +18,8 @@ import TagInfoRepository from "../repositories/TagInfoRepository";
  */
 @injectable()
 export default class ArtController extends AbstractController {
-  private static readonly IMAGE_MAX_WIDTH: number = 1600;
+  private static readonly IMAGE_SMALL_MAX_WIDTH: number = 64;
+  private static readonly IMAGE_MEDIUM_MAX_WIDTH: number = 640;
 
   constructor(
     private artRepository: ArtRepository,
@@ -141,10 +142,26 @@ export default class ArtController extends AbstractController {
   }
 
   public async onUploadImageFile(object: functions.storage.ObjectMetadata) {
-    return await this.storageUtil.resizeImageFile(
+    if (object.name!.includes("_small") || object.name!.includes("_medium")) {
+      return;
+    }
+    if (!this.storageUtil.isImageFile(object)) {
+      return;
+    }
+    // サムネイル画像（小、中）を生成する
+    await this.storageUtil.resizeImageFile(
       object,
-      ArtController.IMAGE_MAX_WIDTH,
-      ArtController.IMAGE_MAX_WIDTH
+      ArtController.IMAGE_SMALL_MAX_WIDTH,
+      ArtController.IMAGE_SMALL_MAX_WIDTH,
+      "inside",
+      this.storageUtil.getThumbnailImageName(object.name!, "_small")
+    );
+    await this.storageUtil.resizeImageFile(
+      object,
+      ArtController.IMAGE_MEDIUM_MAX_WIDTH,
+      ArtController.IMAGE_MEDIUM_MAX_WIDTH,
+      "inside",
+      this.storageUtil.getThumbnailImageName(object.name!, "_medium")
     );
   }
 }

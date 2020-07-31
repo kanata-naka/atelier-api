@@ -87,13 +87,32 @@ export default class TopImageController extends AbstractController {
     await this.topImageRepository.bulkUpdate(data);
   }
 
+  public async onUpdate(
+    change: functions.Change<functions.firestore.DocumentSnapshot>
+  ) {
+    const before = change.before.data() as TopImageModel;
+    const after = change.after.data() as TopImageModel;
+    if (before.image.name !== after.image.name) {
+      await this.storageUtil.deleteFile(before.image.name);
+      console.log(`"${before.image.name}" deleted.`);
+    }
+    if (before.thumbnailImage.name !== after.thumbnailImage.name) {
+      await this.storageUtil.deleteFile(before.thumbnailImage.name);
+      console.log(`"${before.thumbnailImage.name}" deleted.`);
+    }
+  }
+
   /**
    * IDに紐づくトップ画像を削除する
    * @param data
    */
   public async deleteById(data: DeleteByIdData) {
-    await this.storageUtil.deleteFiles(`topImages/${data.id}`);
     await this.topImageRepository.deleteById(data.id);
+  }
+
+  public async onDelete(snapshot: functions.firestore.DocumentSnapshot) {
+    await this.storageUtil.deleteFiles(`topImages/${snapshot.id}`);
+    console.log(`"topImages/${snapshot.id}" deleted.`);
   }
 
   public async onUploadImageFile(object: functions.storage.ObjectMetadata) {

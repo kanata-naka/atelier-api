@@ -57,6 +57,12 @@ export const api = {
           }
           await topImageController.bulkUpdate(data);
         }),
+      onUpdate: functions
+        .region(region)
+        .firestore.document("topImages/{id}")
+        .onUpdate(async (change) => {
+          await topImageController.onUpdate(change);
+        }),
       deleteById: functions
         .region(region)
         .https.onCall(async (data, context) => {
@@ -64,6 +70,12 @@ export const api = {
             throw new HttpsError("unauthenticated", "");
           }
           await topImageController.deleteById(data);
+        }),
+      onDelete: functions
+        .region(region)
+        .firestore.document("topImages/{id}")
+        .onDelete(async (snapshot) => {
+          await topImageController.onDelete(snapshot);
         }),
     };
   })(),
@@ -104,6 +116,12 @@ export const api = {
         }
         await artController.update(data);
       }),
+      onUpdate: functions
+        .region(region)
+        .firestore.document("arts/{id}")
+        .onUpdate(async (change) => {
+          await artController.onUpdate(change);
+        }),
       deleteById: functions
         .region(region)
         .https.onCall(async (data, context) => {
@@ -111,6 +129,12 @@ export const api = {
             throw new HttpsError("unauthenticated", "");
           }
           await artController.deleteById(data);
+        }),
+      onDelete: functions
+        .region(region)
+        .firestore.document("arts/{id}")
+        .onDelete(async (snapshot) => {
+          await artController.onDelete(snapshot);
         }),
     };
   })(),
@@ -135,6 +159,12 @@ export const api = {
         }
         await workController.update(data);
       }),
+      onUpdate: functions
+        .region(region)
+        .firestore.document("works/{id}")
+        .onUpdate(async (change) => {
+          await workController.onUpdate(change);
+        }),
       deleteById: functions
         .region(region)
         .https.onCall(async (data, context) => {
@@ -143,13 +173,19 @@ export const api = {
           }
           await workController.deleteById(data);
         }),
+      onDelete: functions
+        .region(region)
+        .firestore.document("works/{id}")
+        .onDelete(async (snapshot) => {
+          await workController.onDelete(snapshot);
+        }),
     };
   })(),
   adminUsers: (() => {
     return {
       onCreate: functions
         .region(region)
-        .firestore.document("admin_users/{documentId}")
+        .firestore.document("admin_users/{id}")
         .onCreate(async (snapshot) => {
           const adminUser = snapshot.data();
           if (adminUser) {
@@ -160,7 +196,7 @@ export const api = {
         }),
       onDelete: functions
         .region(region)
-        .firestore.document("admin_users/{documentId}")
+        .firestore.document("admin_users/{id}")
         .onDelete(async (snapshot) => {
           const adminUser = snapshot.data();
           if (adminUser) {

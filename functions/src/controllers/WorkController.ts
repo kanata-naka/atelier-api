@@ -94,13 +94,36 @@ export default class WorkController extends AbstractController {
     await this.workRepository.update(model);
   }
 
+  public async onUpdate(
+    change: functions.Change<functions.firestore.DocumentSnapshot>
+  ) {
+    const before = change.before.data() as WorkModel;
+    const after = change.after.data() as WorkModel;
+    await Promise.all(
+      before.images.map(async (beforeImage) => {
+        if (
+          !after.images.find(
+            (afterImage) => afterImage.name === beforeImage.name
+          )
+        ) {
+          await this.storageUtil.deleteFile(beforeImage.name);
+          console.log(`"${beforeImage.name}" deleted.`);
+        }
+      })
+    );
+  }
+
   /**
    * IDに紐づく作品を削除する
    * @param data
    */
   public async deleteById(data: DeleteByIdData) {
-    await this.storageUtil.deleteFiles(`works/${data.id}`);
     await this.workRepository.deleteById(data.id);
+  }
+
+  public async onDelete(snapshot: functions.firestore.DocumentSnapshot) {
+    await this.storageUtil.deleteFiles(`works/${snapshot.id}`);
+    console.log(`"works/${snapshot.id}" deleted.`);
   }
 
   public async onUploadImageFile(object: functions.storage.ObjectMetadata) {

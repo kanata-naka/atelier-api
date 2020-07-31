@@ -106,15 +106,38 @@ export default class ArtController extends AbstractController {
     await this.tagInfoRepository.aggregateById("arts");
   }
 
+  public async onUpdate(
+    change: functions.Change<functions.firestore.DocumentSnapshot>
+  ) {
+    const before = change.before.data() as ArtModel;
+    const after = change.after.data() as ArtModel;
+    await Promise.all(
+      before.images.map(async (beforeImage) => {
+        if (
+          !after.images.find(
+            (afterImage) => afterImage.name === beforeImage.name
+          )
+        ) {
+          await this.storageUtil.deleteFile(beforeImage.name);
+          console.log(`"${beforeImage.name}" deleted.`);
+        }
+      })
+    );
+  }
+
   /**
    * IDに紐づくアート（イラスト）を削除する
    * @param data
    */
   public async deleteById(data: DeleteByIdData) {
-    await this.storageUtil.deleteFiles(`arts/${data.id}`);
     await this.artRepository.deleteById(data.id);
     // タグ情報を更新する
     await this.tagInfoRepository.aggregateById("arts");
+  }
+
+  public async onDelete(snapshot: functions.firestore.DocumentSnapshot) {
+    await this.storageUtil.deleteFiles(`arts/${snapshot.id}`);
+    console.log(`"arts/${snapshot.id}" deleted.`);
   }
 
   public async onUploadImageFile(object: functions.storage.ObjectMetadata) {

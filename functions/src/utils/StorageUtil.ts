@@ -40,6 +40,14 @@ export default class StorageUtil {
   }
 
   /**
+   * ストレージからファイルを削除する
+   * @param name ディレクトリ名
+   */
+  public async deleteFile(name: string) {
+    await this.bucket.file(name).delete();
+  }
+
+  /**
    * ストレージからディレクトリとその配下のファイルを全て削除する
    * @param directory ディレクトリ名
    */
@@ -64,6 +72,7 @@ export default class StorageUtil {
       if (!contentType?.startsWith("image/")) {
         console.warn(`"${name}" is not an image.`);
         resolve();
+        return;
       }
       const bucket = admin.storage().bucket(object.bucket);
       const stream = bucket.file(name).createWriteStream({
@@ -82,7 +91,7 @@ export default class StorageUtil {
             data.height <= maxHeight
           ) {
             console.log(`"${name}" has not need to resize.`);
-            resolve();
+            return;
           }
           pipeline
             .resize({
@@ -91,6 +100,7 @@ export default class StorageUtil {
               fit: "inside",
             })
             .pipe(stream);
+          console.log(`"${name}" resized.`);
         })
         .catch(reject);
       bucket.file(name).createReadStream().pipe(pipeline);

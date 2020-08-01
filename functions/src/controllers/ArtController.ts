@@ -112,18 +112,25 @@ export default class ArtController extends AbstractController {
   ) {
     const before = change.before.data() as ArtModel;
     const after = change.after.data() as ArtModel;
-    await Promise.all(
-      before.images.map(async (beforeImage) => {
-        if (
-          !after.images.find(
-            (afterImage) => afterImage.name === beforeImage.name
-          )
-        ) {
-          await this.storageUtil.deleteFile(beforeImage.name);
-          console.log(`"${beforeImage.name}" deleted.`);
-        }
-      })
-    );
+    for (let beforeImage of before.images) {
+      if (
+        after.images.find((afterImage) => afterImage.name === beforeImage.name)
+      ) {
+        continue;
+      }
+      await Promise.all(
+        [
+          beforeImage.name,
+          this.storageUtil.getThumbnailImageName(beforeImage.name, "_small"),
+          this.storageUtil.getThumbnailImageName(beforeImage.name, "_medium"),
+        ].map((name) =>
+          this.storageUtil
+            .deleteFile(name)
+            .then(() => console.log(`"${name}" deleted.`))
+            .catch(() => console.error(`"${name}" failed to delete.`))
+        )
+      );
+    }
   }
 
   /**

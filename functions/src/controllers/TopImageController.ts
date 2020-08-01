@@ -93,12 +93,18 @@ export default class TopImageController extends AbstractController {
     const before = change.before.data() as TopImageModel;
     const after = change.after.data() as TopImageModel;
     if (before.image.name !== after.image.name) {
-      await this.storageUtil.deleteFile(before.image.name);
-      console.log(`"${before.image.name}" deleted.`);
+      await this.storageUtil
+        .deleteFile(before.image.name)
+        .then(() => console.log(`"${before.image.name}" deleted.`))
+        .catch(() => console.error(`"${before.image.name}" failed to delete.`));
     }
     if (before.thumbnailImage.name !== after.thumbnailImage.name) {
-      await this.storageUtil.deleteFile(before.thumbnailImage.name);
-      console.log(`"${before.thumbnailImage.name}" deleted.`);
+      await this.storageUtil
+        .deleteFile(before.thumbnailImage.name)
+        .then(() => console.log(`"${before.thumbnailImage.name}" deleted.`))
+        .catch(() =>
+          console.error(`"${before.thumbnailImage.name}" failed to delete.`)
+        );
     }
   }
 
@@ -151,7 +157,7 @@ export default class TopImageController extends AbstractController {
       return;
     }
     // サムネイル画像をリサイズする
-    return await this.storageUtil.resizeImageFile(
+    await this.storageUtil.resizeImageFile(
       object,
       TopImageController.THUMBNAIL_IMAGE_MAX_WIDTH,
       TopImageController.THUMBNAIL_IMAGE_MAX_WIDTH,

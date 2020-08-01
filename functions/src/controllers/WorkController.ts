@@ -99,18 +99,24 @@ export default class WorkController extends AbstractController {
   ) {
     const before = change.before.data() as WorkModel;
     const after = change.after.data() as WorkModel;
-    await Promise.all(
-      before.images.map(async (beforeImage) => {
-        if (
-          !after.images.find(
-            (afterImage) => afterImage.name === beforeImage.name
-          )
-        ) {
-          await this.storageUtil.deleteFile(beforeImage.name);
-          console.log(`"${beforeImage.name}" deleted.`);
-        }
-      })
-    );
+    for (let beforeImage of before.images) {
+      if (
+        after.images.find((afterImage) => afterImage.name === beforeImage.name)
+      ) {
+        continue;
+      }
+      await Promise.all(
+        [
+          beforeImage.name,
+          this.storageUtil.getThumbnailImageName(beforeImage.name, "_small")
+        ].map((name) =>
+          this.storageUtil
+            .deleteFile(name)
+            .then(() => console.log(`"${name}" deleted.`))
+            .catch(() => console.error(`"${name}" failed to delete.`))
+        )
+      );
+    }
   }
 
   /**
@@ -134,7 +140,7 @@ export default class WorkController extends AbstractController {
       return;
     }
     // サムネイル画像（小）を生成する
-    return await this.storageUtil.resizeImageFile(
+    await this.storageUtil.resizeImageFile(
       object,
       WorkController.IMAGE_SMALL_MAX_WIDTH,
       WorkController.IMAGE_SMALL_MAX_WIDTH,

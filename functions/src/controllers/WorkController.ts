@@ -18,6 +18,7 @@ import WorkCreateData from "../dto/WorkCreateData";
 @injectable()
 export default class WorkController extends AbstractController {
   private static readonly IMAGE_SMALL_MAX_WIDTH: number = 64;
+  private static readonly IMAGE_MAX_WIDTH: number = 1200;
 
   constructor(
     private workRepository: WorkRepository,
@@ -108,7 +109,7 @@ export default class WorkController extends AbstractController {
       await Promise.all(
         [
           beforeImage.name,
-          this.storageUtil.getThumbnailImageName(beforeImage.name, "_small")
+          this.storageUtil.getThumbnailImageName(beforeImage.name, "_small"),
         ].map((name) =>
           this.storageUtil
             .deleteFile(name)
@@ -140,12 +141,34 @@ export default class WorkController extends AbstractController {
       return;
     }
     // サムネイル画像（小）を生成する
-    await this.storageUtil.resizeImageFile(
-      object,
-      WorkController.IMAGE_SMALL_MAX_WIDTH,
-      WorkController.IMAGE_SMALL_MAX_WIDTH,
-      "inside",
-      this.storageUtil.getThumbnailImageName(object.name!, "_small")
+    let destinationName = this.storageUtil.getThumbnailImageName(
+      object.name!,
+      "_small"
     );
+    if (!this.storageUtil.exists(destinationName)) {
+      await this.storageUtil.resizeImageFile(
+        object,
+        WorkController.IMAGE_SMALL_MAX_WIDTH,
+        WorkController.IMAGE_SMALL_MAX_WIDTH,
+        "inside",
+        destinationName
+      );
+    }
+    // 画像をリサイズする
+    if (
+      await this.storageUtil.needToResizeImageFile(
+        object,
+        WorkController.IMAGE_MAX_WIDTH,
+        WorkController.IMAGE_MAX_WIDTH,
+        "inside"
+      )
+    ) {
+      await this.storageUtil.resizeImageFile(
+        object,
+        WorkController.IMAGE_MAX_WIDTH,
+        WorkController.IMAGE_MAX_WIDTH,
+        "inside"
+      );
+    }
   }
 }

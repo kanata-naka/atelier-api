@@ -16,8 +16,8 @@ import DeleteByIdData from "../dto/DeleteByIdData";
  */
 @injectable()
 export default class TopImageController extends AbstractController {
-  private static readonly IMAGE_MAX_WIDTH: number = 1920;
-  private static readonly IMAGE_MAX_HEIGHT: number = 1152;
+  private static readonly IMAGE_MAX_WIDTH: number = 1600;
+  private static readonly IMAGE_MAX_HEIGHT: number = 960;
   private static readonly THUMBNAIL_IMAGE_MAX_WIDTH: number = 32;
 
   constructor(

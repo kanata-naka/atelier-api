@@ -19,7 +19,7 @@ import TagInfoRepository from "../repositories/TagInfoRepository";
 @injectable()
 export default class ArtController extends AbstractController {
   private static readonly IMAGE_SMALL_MAX_WIDTH: number = 64;
-  private static readonly IMAGE_MEDIUM_MAX_WIDTH: number = 640;
+  private static readonly IMAGE_MEDIUM_MAX_WIDTH: number = 720;
 
   constructor(
     private artRepository: ArtRepository,

@@ -25,7 +25,6 @@ export default class StorageUtil {
 
   /**
    * ファイルのURLを取得する
-   * @param name ストレージ上のパス
    */
   public getFileUrl(name: string) {
     const file = this.bucket.file(name);
@@ -41,7 +40,6 @@ export default class StorageUtil {
 
   /**
    * ストレージからファイルを削除する
-   * @param name ディレクトリ名
    */
   public async deleteFile(name: string) {
     await this.bucket.file(name).delete();
@@ -49,10 +47,16 @@ export default class StorageUtil {
 
   /**
    * ストレージからディレクトリとその配下のファイルを全て削除する
-   * @param directory ディレクトリ名
    */
   public async deleteFiles(directory: string) {
     await this.bucket.deleteFiles({ directory });
+  }
+
+  /**
+   * ファイルが存在するかどうかを判定する
+   */
+  public async exists(name: string) {
+    return (await this.bucket.file(name).exists())[0];
   }
 
   /**

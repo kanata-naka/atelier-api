@@ -178,20 +178,22 @@ export default class ArtController extends AbstractController {
   }
 
   public async onUploadImageFile(object: functions.storage.ObjectMetadata) {
+    const name = object.name!;
+
     if (
-      object.name!.includes(ArtController.IMAGE_SMALL_NAME_SUFFIX) ||
-      object.name!.includes(ArtController.IMAGE_MEDIUM_NAME_SUFFIX)
+      name.includes(ArtController.IMAGE_SMALL_NAME_SUFFIX) ||
+      name.includes(ArtController.IMAGE_MEDIUM_NAME_SUFFIX)
     ) {
       return;
     }
     if (!this.storageUtil.isImageFile(object)) {
       return;
     }
-    await this.storageUtil.makePublic(object.name!);
+    await this.storageUtil.makePublic(name);
 
     // サムネイル画像（小）を生成する
     const smallImageName = this.storageUtil.addSuffix(
-      object.name!,
+      name,
       ArtController.IMAGE_SMALL_NAME_SUFFIX
     );
     await this.storageUtil.resizeImageFile(
@@ -205,7 +207,7 @@ export default class ArtController extends AbstractController {
 
     // サムネイル画像（中）を生成する
     const mediumImageName = this.storageUtil.addSuffix(
-      object.name!,
+      name,
       ArtController.IMAGE_MEDIUM_NAME_SUFFIX
     );
     await this.storageUtil.resizeImageFile(

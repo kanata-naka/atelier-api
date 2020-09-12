@@ -64,7 +64,7 @@ export default class WorkController extends AbstractController {
             // url: await this.storageUtil.getSignedUrl(image.name),
             url: this.storageUtil.getPublicUrl(image.name),
             thumbnailUrl: {
-              small: this.getThumbnailUrl(
+              small: await this.getThumbnailUrl(
                 image.name,
                 WorkController.IMAGE_SMALL_NAME_SUFFIX
               ),
@@ -155,18 +155,21 @@ export default class WorkController extends AbstractController {
   }
 
   public async onUploadImageFile(object: functions.storage.ObjectMetadata) {
-    if (object.name!.includes("_small")) {
+    const name = object.name!;
+
+    if (
+      name.includes(WorkController.IMAGE_SMALL_NAME_SUFFIX) ||
+      !this.storageUtil.isImageFile(object)
+    ) {
       return;
     }
-    if (!this.storageUtil.isImageFile(object)) {
-      return;
-    }
+
     // サムネイル画像（小）を生成する
     let smallImageName = this.storageUtil.addSuffix(
-      object.name!,
+      name,
       WorkController.IMAGE_SMALL_NAME_SUFFIX
     );
-    if (!this.storageUtil.exists(smallImageName)) {
+    if (!(await this.storageUtil.exists(smallImageName))) {
       await this.storageUtil.resizeImageFile(
         object,
         WorkController.IMAGE_SMALL_MAX_WIDTH,
@@ -174,8 +177,8 @@ export default class WorkController extends AbstractController {
         "inside",
         smallImageName
       );
+      await this.storageUtil.makePublic(smallImageName);
     }
-    await this.storageUtil.makePublic(smallImageName);
 
     // 画像をリサイズする
     if (
@@ -192,7 +195,7 @@ export default class WorkController extends AbstractController {
         WorkController.IMAGE_MAX_WIDTH,
         "inside"
       );
-      await this.storageUtil.makePublic(object.name!);
+      await this.storageUtil.makePublic(name);
     }
   }
 }

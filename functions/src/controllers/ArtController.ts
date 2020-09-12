@@ -18,7 +18,9 @@ import TagInfoRepository from "../repositories/TagInfoRepository";
  */
 @injectable()
 export default class ArtController extends AbstractController {
+  private static readonly IMAGE_SMALL_NAME_SUFFIX: string = "_small";
   private static readonly IMAGE_SMALL_MAX_WIDTH: number = 64;
+  private static readonly IMAGE_MEDIUM_NAME_SUFFIX: string = "_medium";
   private static readonly IMAGE_MEDIUM_MAX_WIDTH: number = 720;
 
   constructor(
@@ -64,7 +66,21 @@ export default class ArtController extends AbstractController {
         model.images.map(async (image) => {
           return {
             name: image.name,
-            url: await this.storageUtil.getFileUrl(image.name),
+            url: await this.storageUtil.getSignedUrl(image.name),
+            thumbnailUrl: {
+              small: await this.storageUtil.getSignedUrl(
+                this.storageUtil.addSuffix(
+                  image.name,
+                  ArtController.IMAGE_SMALL_NAME_SUFFIX
+                )
+              ),
+              medium: await this.storageUtil.getSignedUrl(
+                this.storageUtil.addSuffix(
+                  image.name,
+                  ArtController.IMAGE_MEDIUM_NAME_SUFFIX
+                )
+              ),
+            },
           };
         })
       ),
@@ -121,8 +137,14 @@ export default class ArtController extends AbstractController {
       await Promise.all(
         [
           beforeImage.name,
-          this.storageUtil.getThumbnailImageName(beforeImage.name, "_small"),
-          this.storageUtil.getThumbnailImageName(beforeImage.name, "_medium"),
+          this.storageUtil.addSuffix(
+            beforeImage.name,
+            ArtController.IMAGE_SMALL_NAME_SUFFIX
+          ),
+          this.storageUtil.addSuffix(
+            beforeImage.name,
+            ArtController.IMAGE_MEDIUM_NAME_SUFFIX
+          ),
         ].map((name) =>
           this.storageUtil
             .deleteFile(name)
@@ -149,26 +171,39 @@ export default class ArtController extends AbstractController {
   }
 
   public async onUploadImageFile(object: functions.storage.ObjectMetadata) {
-    if (object.name!.includes("_small") || object.name!.includes("_medium")) {
+    if (
+      object.name!.includes(ArtController.IMAGE_SMALL_NAME_SUFFIX) ||
+      object.name!.includes(ArtController.IMAGE_MEDIUM_NAME_SUFFIX)
+    ) {
       return;
     }
     if (!this.storageUtil.isImageFile(object)) {
       return;
     }
     // サムネイル画像（小、中）を生成する
+    const smallImageName = this.storageUtil.addSuffix(
+      object.name!,
+      ArtController.IMAGE_SMALL_NAME_SUFFIX
+    );
     await this.storageUtil.resizeImageFile(
       object,
       ArtController.IMAGE_SMALL_MAX_WIDTH,
       ArtController.IMAGE_SMALL_MAX_WIDTH,
       "inside",
-      this.storageUtil.getThumbnailImageName(object.name!, "_small")
+      smallImageName
+    );
+    await this.storageUtil.makePublic(smallImageName);
+    const mediumImageName = this.storageUtil.addSuffix(
+      object.name!,
+      ArtController.IMAGE_MEDIUM_NAME_SUFFIX
     );
     await this.storageUtil.resizeImageFile(
       object,
       ArtController.IMAGE_MEDIUM_MAX_WIDTH,
       ArtController.IMAGE_MEDIUM_MAX_WIDTH,
       "inside",
-      this.storageUtil.getThumbnailImageName(object.name!, "_medium")
+      mediumImageName
     );
+    await this.storageUtil.makePublic(mediumImageName);
   }
 }

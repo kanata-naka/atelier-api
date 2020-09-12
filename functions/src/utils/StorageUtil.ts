@@ -7,10 +7,35 @@ import * as sharp from "sharp";
  * ストレージのユーティリティ
  */
 export default class StorageUtil {
+  private static readonly PUBLIC_URL_BASE: string =
+    "https://storage.googleapis.com";
+
   protected bucket: Bucket;
 
   constructor() {
     this.bucket = admin.storage().bucket();
+  }
+
+  /**
+   * ファイルが存在するかどうかを判定する
+   */
+  public async exists(name: string) {
+    return (await this.bucket.file(name).exists())[0];
+  }
+
+  /**
+   * ファイルの公開URLを取得する
+   * @param name
+   */
+  public getPublicUrl(name: string) {
+    return `${StorageUtil.PUBLIC_URL_BASE}/${this.bucket.name}/${name}`;
+  }
+
+  /**
+   * ファイルを一般公開する
+   */
+  public async makePublic(name: string) {
+    await this.bucket.file(name).makePublic();
   }
 
   /**
@@ -24,9 +49,9 @@ export default class StorageUtil {
   }
 
   /**
-   * ファイルのURLを取得する
+   * ファイルの認証済みURLを取得する
    */
-  public getFileUrl(name: string) {
+  public getSignedUrl(name: string) {
     const file = this.bucket.file(name);
     return new Promise<string>((resolve) => {
       file.getSignedUrl(
@@ -53,13 +78,6 @@ export default class StorageUtil {
   }
 
   /**
-   * ファイルが存在するかどうかを判定する
-   */
-  public async exists(name: string) {
-    return (await this.bucket.file(name).exists())[0];
-  }
-
-  /**
    * 画像ファイルかどうかを判定する
    */
   public isImageFile(object: functions.storage.ObjectMetadata): boolean {
@@ -73,9 +91,9 @@ export default class StorageUtil {
   }
 
   /**
-   * サムネイル画像のファイル名を取得する
+   * ファイル名にサフィックス（接尾辞）を追加する
    */
-  public getThumbnailImageName(name: string, suffix: string): string {
+  public addSuffix(name: string, suffix: string): string {
     const index: number = name.lastIndexOf(".");
     return name.slice(0, index) + suffix + name.slice(index);
   }

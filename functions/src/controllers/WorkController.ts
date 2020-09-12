@@ -17,6 +17,7 @@ import WorkCreateData from "../dto/WorkCreateData";
  */
 @injectable()
 export default class WorkController extends AbstractController {
+  private static readonly IMAGE_SMALL_NAME_SUFFIX: string = "_small";
   private static readonly IMAGE_SMALL_MAX_WIDTH: number = 64;
   private static readonly IMAGE_MAX_WIDTH: number = 1200;
 
@@ -60,7 +61,15 @@ export default class WorkController extends AbstractController {
         model.images.map(async (image) => {
           return {
             name: image.name,
-            url: await this.storageUtil.getFileUrl(image.name),
+            url: await this.storageUtil.getSignedUrl(image.name),
+            thumbnailUrl: {
+              small: await this.storageUtil.getSignedUrl(
+                this.storageUtil.addSuffix(
+                  image.name,
+                  WorkController.IMAGE_SMALL_NAME_SUFFIX
+                )
+              ),
+            },
           };
         })
       ),
@@ -109,7 +118,10 @@ export default class WorkController extends AbstractController {
       await Promise.all(
         [
           beforeImage.name,
-          this.storageUtil.getThumbnailImageName(beforeImage.name, "_small"),
+          this.storageUtil.addSuffix(
+            beforeImage.name,
+            WorkController.IMAGE_SMALL_NAME_SUFFIX
+          ),
         ].map((name) =>
           this.storageUtil
             .deleteFile(name)
@@ -141,17 +153,17 @@ export default class WorkController extends AbstractController {
       return;
     }
     // サムネイル画像（小）を生成する
-    let destinationName = this.storageUtil.getThumbnailImageName(
+    let smallImageName = this.storageUtil.addSuffix(
       object.name!,
-      "_small"
+      WorkController.IMAGE_SMALL_NAME_SUFFIX
     );
-    if (!this.storageUtil.exists(destinationName)) {
+    if (!this.storageUtil.exists(smallImageName)) {
       await this.storageUtil.resizeImageFile(
         object,
         WorkController.IMAGE_SMALL_MAX_WIDTH,
         WorkController.IMAGE_SMALL_MAX_WIDTH,
         "inside",
-        destinationName
+        smallImageName
       );
     }
     // 画像をリサイズする

@@ -58,11 +58,11 @@ export default class TopImageController extends AbstractController {
       id: model.id!,
       image: {
         name: model.image.name,
-        url: await this.storageUtil.getFileUrl(model.image.name),
+        url: await this.storageUtil.getSignedUrl(model.image.name),
       },
       thumbnailImage: {
         name: model.thumbnailImage.name,
-        url: await this.storageUtil.getFileUrl(model.thumbnailImage.name),
+        url: await this.storageUtil.getSignedUrl(model.thumbnailImage.name),
       },
       description: model.description,
       order: model.order,

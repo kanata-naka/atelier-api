@@ -61,13 +61,12 @@ export default class WorkController extends AbstractController {
         model.images.map(async (image) => {
           return {
             name: image.name,
-            url: await this.storageUtil.getSignedUrl(image.name),
+            // url: await this.storageUtil.getSignedUrl(image.name),
+            url: this.storageUtil.getPublicUrl(image.name),
             thumbnailUrl: {
-              small: await this.storageUtil.getSignedUrl(
-                this.storageUtil.addSuffix(
-                  image.name,
-                  WorkController.IMAGE_SMALL_NAME_SUFFIX
-                )
+              small: this.getThumbnailUrl(
+                image.name,
+                WorkController.IMAGE_SMALL_NAME_SUFFIX
               ),
             },
           };
@@ -78,6 +77,16 @@ export default class WorkController extends AbstractController {
       createdAt: model.createdAt?.seconds,
       updatedAt: model.updatedAt?.seconds,
     };
+  }
+
+  /**
+   * サムネイル画像のURLを取得する
+   */
+  private async getThumbnailUrl(name: string, suffix: string) {
+    // return await this.storageUtil.getSignedUrl(
+    return this.storageUtil.getPublicUrl(
+      this.storageUtil.addSuffix(name, suffix)
+    );
   }
 
   /**
@@ -166,6 +175,8 @@ export default class WorkController extends AbstractController {
         smallImageName
       );
     }
+    await this.storageUtil.makePublic(smallImageName);
+
     // 画像をリサイズする
     if (
       await this.storageUtil.needToResizeImageFile(
@@ -181,6 +192,7 @@ export default class WorkController extends AbstractController {
         WorkController.IMAGE_MAX_WIDTH,
         "inside"
       );
+      await this.storageUtil.makePublic(object.name!);
     }
   }
 }

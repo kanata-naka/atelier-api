@@ -66,19 +66,16 @@ export default class ArtController extends AbstractController {
         model.images.map(async (image) => {
           return {
             name: image.name,
-            url: await this.storageUtil.getSignedUrl(image.name),
+            // url: await this.storageUtil.getSignedUrl(image.name),
+            url: this.storageUtil.getPublicUrl(image.name),
             thumbnailUrl: {
-              small: await this.storageUtil.getSignedUrl(
-                this.storageUtil.addSuffix(
-                  image.name,
-                  ArtController.IMAGE_SMALL_NAME_SUFFIX
-                )
+              small: await this.getThumbnailUrl(
+                image.name,
+                ArtController.IMAGE_SMALL_NAME_SUFFIX
               ),
-              medium: await this.storageUtil.getSignedUrl(
-                this.storageUtil.addSuffix(
-                  image.name,
-                  ArtController.IMAGE_MEDIUM_NAME_SUFFIX
-                )
+              medium: await this.getThumbnailUrl(
+                image.name,
+                ArtController.IMAGE_MEDIUM_NAME_SUFFIX
               ),
             },
           };
@@ -89,6 +86,16 @@ export default class ArtController extends AbstractController {
       createdAt: model.createdAt?.seconds,
       updatedAt: model.updatedAt?.seconds,
     };
+  }
+
+  /**
+   * サムネイル画像のURLを取得する
+   */
+  private async getThumbnailUrl(name: string, suffix: string) {
+    // return await this.storageUtil.getSignedUrl(
+    return this.storageUtil.getPublicUrl(
+      this.storageUtil.addSuffix(name, suffix)
+    );
   }
 
   /**
@@ -180,7 +187,9 @@ export default class ArtController extends AbstractController {
     if (!this.storageUtil.isImageFile(object)) {
       return;
     }
-    // サムネイル画像（小、中）を生成する
+    await this.storageUtil.makePublic(object.name!);
+
+    // サムネイル画像（小）を生成する
     const smallImageName = this.storageUtil.addSuffix(
       object.name!,
       ArtController.IMAGE_SMALL_NAME_SUFFIX
@@ -193,6 +202,8 @@ export default class ArtController extends AbstractController {
       smallImageName
     );
     await this.storageUtil.makePublic(smallImageName);
+
+    // サムネイル画像（中）を生成する
     const mediumImageName = this.storageUtil.addSuffix(
       object.name!,
       ArtController.IMAGE_MEDIUM_NAME_SUFFIX

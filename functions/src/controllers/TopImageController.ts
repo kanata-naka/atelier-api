@@ -58,11 +58,13 @@ export default class TopImageController extends AbstractController {
       id: model.id!,
       image: {
         name: model.image.name,
-        url: await this.storageUtil.getSignedUrl(model.image.name),
+        // url: await this.storageUtil.getSignedUrl(model.image.name),
+        url: this.storageUtil.getPublicUrl(model.image.name),
       },
       thumbnailImage: {
         name: model.thumbnailImage.name,
-        url: await this.storageUtil.getSignedUrl(model.thumbnailImage.name),
+        // url: await this.storageUtil.getSignedUrl(model.thumbnailImage.name),
+        url: this.storageUtil.getPublicUrl(model.thumbnailImage.name),
       },
       description: model.description,
       order: model.order,
@@ -134,12 +136,13 @@ export default class TopImageController extends AbstractController {
       return;
     }
     // 画像をリサイズする
-    return await this.storageUtil.resizeImageFile(
+    await this.storageUtil.resizeImageFile(
       object,
       TopImageController.IMAGE_MAX_WIDTH,
       TopImageController.IMAGE_MAX_HEIGHT,
       "cover"
     );
+    await this.storageUtil.makePublic(object.name!);
   }
 
   public async onUploadThumbnailImageFile(
@@ -163,5 +166,6 @@ export default class TopImageController extends AbstractController {
       TopImageController.THUMBNAIL_IMAGE_MAX_WIDTH,
       "cover"
     );
+    await this.storageUtil.makePublic(object.name!);
   }
 }

@@ -19,9 +19,9 @@ export default class WorkRepository extends AbstractRepository<WorkModel> {
       condition.sort?.column || "createdAt",
       condition.sort?.order || "desc"
     );
-    if (condition.pickupFlag) {
-      // 条件：ピックアップフラグ
-      query = query.where("pickupFlag", "==", true);
+    if (condition.restrict) {
+      // 条件：公開範囲
+      query = query.where("restrict", "in", condition.restrict);
     }
     if (condition.limit) {
       // 条件：一度に取得する最大件数

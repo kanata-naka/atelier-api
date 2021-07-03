@@ -73,7 +73,7 @@ export default class WorkController extends AbstractController {
         })
       ),
       description: model.description,
-      pickupFlag: model.pickupFlag,
+      restrict: model.restrict,
       createdAt: model.createdAt?.seconds,
       updatedAt: model.updatedAt?.seconds,
     };

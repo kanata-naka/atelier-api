@@ -21,9 +21,9 @@ export default class ArtRepository extends AbstractRepository<ArtModel> {
       // 条件：タグ
       query = query.where("tags", "array-contains", condition.tag);
     }
-    if (condition.pickupFlag) {
-      // 条件：ピックアップフラグ
-      query = query.where("pickupFlag", "==", true);
+    if (condition.restrict) {
+      // 条件：公開範囲
+      query = query.where("restrict", "in", condition.restrict);
     }
     if (condition.lastId) {
       // 条件：最後のID（自動スクロール用）

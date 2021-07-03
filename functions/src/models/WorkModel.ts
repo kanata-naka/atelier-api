@@ -15,6 +15,6 @@ export default class WorkModel extends AbstractModel {
   }>;
   /** 説明 */
   description?: string;
-  /** ピックアップフラグ */
-  pickupFlag?: boolean = false;
+  /** 公開範囲 */
+  restrict?: string = '0';
 }

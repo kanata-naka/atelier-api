@@ -81,7 +81,7 @@ export default class ArtController extends AbstractController {
           };
         })
       ),
-      pickupFlag: model.pickupFlag,
+      restrict: model.restrict,
       description: model.description,
       createdAt: model.createdAt?.seconds,
       updatedAt: model.updatedAt?.seconds,

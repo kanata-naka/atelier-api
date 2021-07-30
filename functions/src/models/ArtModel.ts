@@ -16,5 +16,5 @@ export default class ArtModel extends AbstractModel {
   /** 説明 */
   description?: string;
   /** 公開範囲 */
-  restrict?: string = '0';
+  restrict?: string = "0";
 }

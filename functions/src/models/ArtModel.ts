@@ -1,7 +1,7 @@
 import AbstractModel from "./AbstractModel";
 
 /**
- * アート（イラスト）のモデル
+ * アートのモデル
  */
 export default class ArtModel extends AbstractModel {
   /** タイトル */

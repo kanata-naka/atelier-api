@@ -1,5 +1,5 @@
 /**
- * アート（イラスト）の一覧を取得する条件
+ * アートの一覧を取得する条件
  */
 export default class ArtGetCondition {
   /** タグ */

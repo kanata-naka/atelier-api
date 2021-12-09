@@ -3,7 +3,7 @@ import ArtModel from "../models/ArtModel";
 import ArtGetCondition from "../dto/ArtGetCondition";
 
 /**
- * アート（イラスト）のリポジトリ
+ * アートのリポジトリ
  */
 export default class ArtRepository extends AbstractRepository<ArtModel> {
   constructor() {
@@ -11,7 +11,7 @@ export default class ArtRepository extends AbstractRepository<ArtModel> {
   }
 
   /**
-   * アート（イラスト）の一覧を取得する
+   * アートの一覧を取得する
    * @param condition
    */
   public async get(condition: ArtGetCondition): Promise<Array<ArtModel>> {
@@ -27,16 +27,14 @@ export default class ArtRepository extends AbstractRepository<ArtModel> {
     }
     if (condition.lastId) {
       // 条件：最後のID（自動スクロール用）
-      query = query.startAfter(
-        await this.collectionRef.doc(condition.lastId).get()
-      );
+      query = query.startAfter(await this.collectionRef.doc(condition.lastId).get());
     }
     if (condition.limit) {
       // 条件：一度に取得する最大件数
       query = query.limit(condition.limit);
     }
-    const querySnapshot = await query.get();
-    return querySnapshot.docs.map((documentSnapshot) => {
+
+    return (await query.get()).docs.map((documentSnapshot) => {
       const result = documentSnapshot.data() as ArtModel;
       result.id = documentSnapshot.id;
       return result;

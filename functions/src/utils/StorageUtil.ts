@@ -7,8 +7,7 @@ import * as sharp from "sharp";
  * ストレージのユーティリティ
  */
 export default class StorageUtil {
-  private static readonly PUBLIC_URL_BASE: string =
-    "https://storage.googleapis.com";
+  private static readonly PUBLIC_URL_BASE: string = "https://storage.googleapis.com";
 
   protected bucket: Bucket;
 
@@ -17,7 +16,7 @@ export default class StorageUtil {
   }
 
   /**
-   * ファイルが存在するかどうかを判定する
+   * ファイルが存在するかを判定する
    */
   public async exists(name: string) {
     return (await this.bucket.file(name).exists())[0];
@@ -53,12 +52,9 @@ export default class StorageUtil {
    */
   public getSignedUrl(name: string) {
     const file = this.bucket.file(name);
-    return new Promise<string>((resolve) => {
-      file.getSignedUrl(
-        { action: "read", expires: StorageUtil.getExpiredDate() },
-        (error, url) => {
-          resolve(url);
-        }
+    return new Promise<string>((resolve, reject) => {
+      file.getSignedUrl({ action: "read", expires: StorageUtil.getExpiredDate() }, (error, url) =>
+        url ? resolve(url) : reject()
       );
     });
   }
@@ -78,7 +74,7 @@ export default class StorageUtil {
   }
 
   /**
-   * 画像ファイルかどうかを判定する
+   * 画像ファイルかを判定する
    */
   public isImageFile(object: functions.storage.ObjectMetadata): boolean {
     const name = object.name!;
@@ -99,7 +95,7 @@ export default class StorageUtil {
   }
 
   /**
-   * 画像ファイルのリサイズが必要かどうかを判定する
+   * 画像ファイルのリサイズが必要かを判定する
    */
   public async needToResizeImageFile(
     object: functions.storage.ObjectMetadata,
@@ -155,7 +151,7 @@ export default class StorageUtil {
     fit: "inside" | "cover" = "inside",
     destinationName?: string
   ) {
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       const name = object.name!;
       const bucket = admin.storage().bucket(object.bucket);
       const stream = bucket.file(destinationName || name).createWriteStream({
@@ -174,11 +170,7 @@ export default class StorageUtil {
       bucket.file(name).createReadStream().pipe(pipeline);
       stream
         .on("finish", () => {
-          console.log(
-            `"${name}" resized${
-              destinationName ? ` and saved as ${destinationName}` : ""
-            }.`
-          );
+          console.log(`"${name}" resized${destinationName ? ` and saved as ${destinationName}` : ""}.`);
           resolve();
         })
         .on("error", reject);

@@ -5,7 +5,7 @@ import BlogRepository from "../repositories/BlogRepository";
 import BlogGetArticlesData from "../dto/BlogGetArticlesData";
 
 /**
- * ブログ（note）のコントローラ
+ * ブログのコントローラ
  */
 @injectable()
 export default class BlogController extends AbstractController {
@@ -17,9 +17,7 @@ export default class BlogController extends AbstractController {
    * 記事の一覧を取得する
    * @param data
    */
-  public async getArticles(
-    data: BlogGetArticlesData
-  ): Promise<BlogGetArticlesResponse> {
+  public async getArticles(data: BlogGetArticlesData): Promise<BlogGetArticlesResponse> {
     const items = await this.blogRepository.getArticles();
     let result = items!.map((item) => {
       // 最初の画像

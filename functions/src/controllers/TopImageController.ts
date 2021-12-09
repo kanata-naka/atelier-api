@@ -20,10 +20,7 @@ export default class TopImageController extends AbstractController {
   private static readonly IMAGE_MAX_HEIGHT: number = 960;
   private static readonly THUMBNAIL_IMAGE_MAX_WIDTH: number = 32;
 
-  constructor(
-    private topImageRepository: TopImageRepository,
-    private storageUtil: StorageUtil
-  ) {
+  constructor(private topImageRepository: TopImageRepository, private storageUtil: StorageUtil) {
     super();
   }
 
@@ -34,11 +31,7 @@ export default class TopImageController extends AbstractController {
   public async get(): Promise<TopImageGetResponse> {
     const models: Array<TopImageModel> = await this.topImageRepository.get();
     return {
-      result: await Promise.all(
-        models.map(
-          async (model) => await this.createTopImageGetByIdResponse(model)
-        )
-      ),
+      result: await Promise.all(models.map(async (model) => await this.createTopImageGetByIdResponse(model))),
     };
   }
 
@@ -51,9 +44,7 @@ export default class TopImageController extends AbstractController {
     return await this.createTopImageGetByIdResponse(model);
   }
 
-  private async createTopImageGetByIdResponse(
-    model: TopImageModel
-  ): Promise<TopImageGetByIdResponse> {
+  private async createTopImageGetByIdResponse(model: TopImageModel): Promise<TopImageGetByIdResponse> {
     return {
       id: model.id!,
       image: {
@@ -77,7 +68,7 @@ export default class TopImageController extends AbstractController {
    * トップ画像を登録する
    * @param data
    */
-  public async create(data: TopImageCreateData) {
+  public async create(data: TopImageCreateData): Promise<void> {
     await this.topImageRepository.create(data);
   }
 
@@ -85,15 +76,19 @@ export default class TopImageController extends AbstractController {
    * トップ画像を一括で更新する
    * @param data
    */
-  public async bulkUpdate(data: TopImageBulkUpdateData) {
+  public async bulkUpdate(data: TopImageBulkUpdateData): Promise<void> {
     await this.topImageRepository.bulkUpdate(data);
   }
 
-  public async onUpdate(
-    change: functions.Change<functions.firestore.DocumentSnapshot>
-  ) {
+  /**
+   * トップ画像の更新時に実行する
+   * @param change
+   */
+  public async onUpdate(change: functions.Change<functions.firestore.DocumentSnapshot>): Promise<void> {
     const before = change.before.data() as TopImageModel;
     const after = change.after.data() as TopImageModel;
+
+    // 古い画像を削除する
     if (before.image.name !== after.image.name) {
       await this.storageUtil
         .deleteFile(before.image.name)
@@ -104,9 +99,7 @@ export default class TopImageController extends AbstractController {
       await this.storageUtil
         .deleteFile(before.thumbnailImage.name)
         .then(() => console.log(`"${before.thumbnailImage.name}" deleted.`))
-        .catch(() =>
-          console.error(`"${before.thumbnailImage.name}" failed to delete.`)
-        );
+        .catch(() => console.error(`"${before.thumbnailImage.name}" failed to delete.`));
     }
   }
 
@@ -114,16 +107,24 @@ export default class TopImageController extends AbstractController {
    * IDに紐づくトップ画像を削除する
    * @param data
    */
-  public async deleteById(data: DeleteByIdData) {
+  public async deleteById(data: DeleteByIdData): Promise<void> {
     await this.topImageRepository.deleteById(data.id);
   }
 
-  public async onDelete(snapshot: functions.firestore.DocumentSnapshot) {
+  /**
+   * トップ画像の削除時に実行する
+   * @param snapshot
+   */
+  public async onDelete(snapshot: functions.firestore.DocumentSnapshot): Promise<void> {
     await this.storageUtil.deleteFiles(`topImages/${snapshot.id}`);
     console.log(`"topImages/${snapshot.id}" deleted.`);
   }
 
-  public async onUploadImageFile(object: functions.storage.ObjectMetadata) {
+  /**
+   * 画像のアップロード時に実行する
+   * @param object
+   */
+  public async onUploadImageFile(object: functions.storage.ObjectMetadata): Promise<void> {
     if (
       !this.storageUtil.isImageFile(object) ||
       !(await this.storageUtil.needToResizeImageFile(
@@ -145,9 +146,11 @@ export default class TopImageController extends AbstractController {
     await this.storageUtil.makePublic(object.name!);
   }
 
-  public async onUploadThumbnailImageFile(
-    object: functions.storage.ObjectMetadata
-  ) {
+  /**
+   * サムネイル画像のアップロード時に実行する
+   * @param object
+   */
+  public async onUploadThumbnailImageFile(object: functions.storage.ObjectMetadata): Promise<void> {
     if (
       !this.storageUtil.isImageFile(object) ||
       !(await this.storageUtil.needToResizeImageFile(

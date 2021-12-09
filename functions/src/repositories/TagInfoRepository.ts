@@ -5,9 +5,7 @@ import TagInfoModel from "../models/TagInfoModel";
 /**
  * タグ情報のリポジトリ
  */
-export default class TagInfoRepository extends AbstractRepository<
-  TagInfoModel
-> {
+export default class TagInfoRepository extends AbstractRepository<TagInfoModel> {
   constructor() {
     super("tagInfo");
   }
@@ -18,12 +16,7 @@ export default class TagInfoRepository extends AbstractRepository<
    */
   public async aggregateById(id: string) {
     // 全件取得してタグを集計する
-    const snapshot = await admin
-      .firestore()
-      .collection(id)
-      .orderBy("createdAt", "desc")
-      .select("tags")
-      .get();
+    const snapshot = await admin.firestore().collection(id).orderBy("createdAt", "desc").select("tags").get();
     const info: Array<{
       name: string;
       count: number;

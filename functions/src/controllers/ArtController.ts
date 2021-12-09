@@ -14,7 +14,7 @@ import DeleteByIdData from "../dto/DeleteByIdData";
 import TagInfoRepository from "../repositories/TagInfoRepository";
 
 /**
- * アート（イラスト）のコントローラ
+ * アートのコントローラ
  */
 @injectable()
 export default class ArtController extends AbstractController {
@@ -32,14 +32,12 @@ export default class ArtController extends AbstractController {
   }
 
   /**
-   * アート（イラスト）の一覧を取得する
+   * アートの一覧を取得する
    * @param data
    */
   public async get(data: ArtGetData): Promise<ArtGetResponse> {
     const models: Array<ArtModel> = await this.artRepository.get(data);
-    const result = await Promise.all(
-      models.map(async (model) => await this.createArtGetByIdResponse(model))
-    );
+    const result = await Promise.all(models.map(async (model) => await this.createArtGetByIdResponse(model)));
     return {
       result,
       fetchedAll: data && data.limit ? result.length < data.limit : false,
@@ -47,7 +45,7 @@ export default class ArtController extends AbstractController {
   }
 
   /**
-   * IDに紐づくアート（イラスト）を取得する
+   * IDに紐づくアートを取得する
    * @param data
    */
   public async getById(data: GetByIdData): Promise<ArtGetByIdResponse> {
@@ -55,9 +53,7 @@ export default class ArtController extends AbstractController {
     return await this.createArtGetByIdResponse(model);
   }
 
-  private async createArtGetByIdResponse(
-    model: ArtModel
-  ): Promise<ArtGetByIdResponse> {
+  private async createArtGetByIdResponse(model: ArtModel): Promise<ArtGetByIdResponse> {
     return {
       id: model.id!,
       title: model.title,
@@ -69,14 +65,8 @@ export default class ArtController extends AbstractController {
             // url: await this.storageUtil.getSignedUrl(image.name),
             url: this.storageUtil.getPublicUrl(image.name),
             thumbnailUrl: {
-              small: await this.getThumbnailUrl(
-                image.name,
-                ArtController.IMAGE_SMALL_NAME_SUFFIX
-              ),
-              medium: await this.getThumbnailUrl(
-                image.name,
-                ArtController.IMAGE_MEDIUM_NAME_SUFFIX
-              ),
+              small: await this.getThumbnailUrl(image.name, ArtController.IMAGE_SMALL_NAME_SUFFIX),
+              medium: await this.getThumbnailUrl(image.name, ArtController.IMAGE_MEDIUM_NAME_SUFFIX),
             },
           };
         })
@@ -91,23 +81,19 @@ export default class ArtController extends AbstractController {
   /**
    * サムネイル画像のURLを取得する
    */
-  private async getThumbnailUrl(name: string, suffix: string) {
+  private async getThumbnailUrl(name: string, suffix: string): Promise<string> {
     // return await this.storageUtil.getSignedUrl(
-    return this.storageUtil.getPublicUrl(
-      this.storageUtil.addSuffix(name, suffix)
-    );
+    return this.storageUtil.getPublicUrl(this.storageUtil.addSuffix(name, suffix));
   }
 
   /**
-   * アート（イラスト）を登録する
+   * アートを登録する
    * @param data
    */
-  public async create(data: ArtCreateData) {
+  public async create(data: ArtCreateData): Promise<void> {
     const model: ArtModel = {
       ...data,
-      createdAt: data.createdAt
-        ? this.artRepository.createTimestamp(data.createdAt)
-        : undefined,
+      createdAt: data.createdAt ? this.artRepository.createTimestamp(data.createdAt) : undefined,
     };
     await this.artRepository.create(model);
     // タグ情報を更新する
@@ -115,43 +101,37 @@ export default class ArtController extends AbstractController {
   }
 
   /**
-   * アート（イラスト）を更新する
+   * アートを更新する
    * @param data
    */
-  public async update(data: ArtUpdateData) {
+  public async update(data: ArtUpdateData): Promise<void> {
     const model: ArtModel = {
       ...data,
-      createdAt: data.createdAt
-        ? this.artRepository.createTimestamp(data.createdAt)
-        : undefined,
+      createdAt: data.createdAt ? this.artRepository.createTimestamp(data.createdAt) : undefined,
     };
     await this.artRepository.update(model);
     // タグ情報を更新する
     await this.tagInfoRepository.aggregateById("arts");
   }
 
-  public async onUpdate(
-    change: functions.Change<functions.firestore.DocumentSnapshot>
-  ) {
+  /**
+   * アートの更新時に実行する
+   * @param change
+   */
+  public async onUpdate(change: functions.Change<functions.firestore.DocumentSnapshot>): Promise<void> {
     const before = change.before.data() as ArtModel;
     const after = change.after.data() as ArtModel;
-    for (let beforeImage of before.images) {
-      if (
-        after.images.find((afterImage) => afterImage.name === beforeImage.name)
-      ) {
+
+    // 古い画像を削除する
+    for (const beforeImage of before.images) {
+      if (after.images.find((afterImage) => afterImage.name === beforeImage.name)) {
         continue;
       }
       await Promise.all(
         [
           beforeImage.name,
-          this.storageUtil.addSuffix(
-            beforeImage.name,
-            ArtController.IMAGE_SMALL_NAME_SUFFIX
-          ),
-          this.storageUtil.addSuffix(
-            beforeImage.name,
-            ArtController.IMAGE_MEDIUM_NAME_SUFFIX
-          ),
+          this.storageUtil.addSuffix(beforeImage.name, ArtController.IMAGE_SMALL_NAME_SUFFIX),
+          this.storageUtil.addSuffix(beforeImage.name, ArtController.IMAGE_MEDIUM_NAME_SUFFIX),
         ].map((name) =>
           this.storageUtil
             .deleteFile(name)
@@ -163,27 +143,32 @@ export default class ArtController extends AbstractController {
   }
 
   /**
-   * IDに紐づくアート（イラスト）を削除する
+   * IDに紐づくアートを削除する
    * @param data
    */
-  public async deleteById(data: DeleteByIdData) {
+  public async deleteById(data: DeleteByIdData): Promise<void> {
     await this.artRepository.deleteById(data.id);
     // タグ情報を更新する
     await this.tagInfoRepository.aggregateById("arts");
   }
 
-  public async onDelete(snapshot: functions.firestore.DocumentSnapshot) {
+  /**
+   * アートの削除時に実行する
+   * @param snapshot
+   */
+  public async onDelete(snapshot: functions.firestore.DocumentSnapshot): Promise<void> {
     await this.storageUtil.deleteFiles(`arts/${snapshot.id}`);
     console.log(`"arts/${snapshot.id}" deleted.`);
   }
 
-  public async onUploadImageFile(object: functions.storage.ObjectMetadata) {
+  /**
+   * 画像のアップロード時に実行する
+   * @param object
+   */
+  public async onUploadImageFile(object: functions.storage.ObjectMetadata): Promise<void> {
     const name = object.name!;
 
-    if (
-      name.includes(ArtController.IMAGE_SMALL_NAME_SUFFIX) ||
-      name.includes(ArtController.IMAGE_MEDIUM_NAME_SUFFIX)
-    ) {
+    if (name.includes(ArtController.IMAGE_SMALL_NAME_SUFFIX) || name.includes(ArtController.IMAGE_MEDIUM_NAME_SUFFIX)) {
       return;
     }
     if (!this.storageUtil.isImageFile(object)) {
@@ -192,10 +177,7 @@ export default class ArtController extends AbstractController {
     await this.storageUtil.makePublic(name);
 
     // サムネイル画像（小）を生成する
-    const smallImageName = this.storageUtil.addSuffix(
-      name,
-      ArtController.IMAGE_SMALL_NAME_SUFFIX
-    );
+    const smallImageName = this.storageUtil.addSuffix(name, ArtController.IMAGE_SMALL_NAME_SUFFIX);
     await this.storageUtil.resizeImageFile(
       object,
       ArtController.IMAGE_SMALL_MAX_WIDTH,
@@ -206,10 +188,7 @@ export default class ArtController extends AbstractController {
     await this.storageUtil.makePublic(smallImageName);
 
     // サムネイル画像（中）を生成する
-    const mediumImageName = this.storageUtil.addSuffix(
-      name,
-      ArtController.IMAGE_MEDIUM_NAME_SUFFIX
-    );
+    const mediumImageName = this.storageUtil.addSuffix(name, ArtController.IMAGE_MEDIUM_NAME_SUFFIX);
     await this.storageUtil.resizeImageFile(
       object,
       ArtController.IMAGE_MEDIUM_MAX_WIDTH,

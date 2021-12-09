@@ -13,7 +13,7 @@ export default abstract class AbstractRepository<T extends AbstractModel> {
   }
 
   /**
-   * id に紐づくドキュメントを取得する
+   * IDに紐づくドキュメントを取得する
    * なければエラーを返す
    * @param id
    */
@@ -31,7 +31,7 @@ export default abstract class AbstractRepository<T extends AbstractModel> {
    * ドキュメントを作成する
    * @param model
    */
-  public async create(model: T) {
+  public async create(model: T): Promise<void> {
     const documentRef = this.collectionRef.doc(model.id || uuidv4());
     delete model.id;
     await documentRef.set({
@@ -45,7 +45,7 @@ export default abstract class AbstractRepository<T extends AbstractModel> {
    * ドキュメントを更新する
    * @param model
    */
-  public async update(model: T) {
+  public async update(model: T): Promise<void> {
     const documentRef = this.collectionRef.doc(model.id!);
     delete model.id;
     await documentRef.update({
@@ -58,15 +58,13 @@ export default abstract class AbstractRepository<T extends AbstractModel> {
    * ドキュメントを一括で更新する
    * @param models
    */
-  public async bulkUpdate(models: Array<T>) {
+  public async bulkUpdate(models: Array<T>): Promise<void> {
     let batch = admin.firestore().batch();
     const snapshot = await this.collectionRef.get();
     let count = 0;
     await Promise.all(
       snapshot.docs.map(async (documentSnapshot, index) => {
-        const model = models.find(
-          (_model) => documentSnapshot.id === _model.id
-        );
+        const model = models.find((_model) => documentSnapshot.id === _model.id);
         if (!model) {
           return;
         }
@@ -88,10 +86,10 @@ export default abstract class AbstractRepository<T extends AbstractModel> {
   }
 
   /**
-   * id に紐づくドキュメントを削除する
+   * IDに紐づくドキュメントを削除する
    * @param id
    */
-  public async deleteById(id: string) {
+  public async deleteById(id: string): Promise<void> {
     await this.collectionRef.doc(id).delete();
   }
 
@@ -99,7 +97,7 @@ export default abstract class AbstractRepository<T extends AbstractModel> {
    * ドキュメントを一括で削除する
    * @param ids
    */
-  public async bulkDelete(ids: Array<string>) {
+  public async bulkDelete(ids: Array<string>): Promise<void> {
     let batch = admin.firestore().batch();
     const snapshot = await this.collectionRef.get();
     let count = 0;
@@ -124,15 +122,15 @@ export default abstract class AbstractRepository<T extends AbstractModel> {
   /**
    * 現在日時を取得する
    */
-  protected get now() {
+  protected get now(): FirebaseFirestore.FieldValue {
     return admin.firestore.FieldValue.serverTimestamp();
   }
 
   /**
-   * UNIXタイムスタンプ（秒）から@code{Timestamp}オブジェクトを生成する
+   * UNIXタイムスタンプ（秒）から {@link FirebaseFirestore.Timestamp} を生成する
    * @param seconds
    */
-  public createTimestamp(seconds: number) {
+  public createTimestamp(seconds: number): FirebaseFirestore.Timestamp {
     return admin.firestore.Timestamp.fromMillis(seconds * 1000);
   }
 }

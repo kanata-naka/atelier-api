@@ -21,10 +21,7 @@ export default class WorkController extends AbstractController {
   private static readonly IMAGE_SMALL_MAX_WIDTH: number = 64;
   private static readonly IMAGE_MAX_WIDTH: number = 1200;
 
-  constructor(
-    private workRepository: WorkRepository,
-    private storageUtil: StorageUtil
-  ) {
+  constructor(private workRepository: WorkRepository, private storageUtil: StorageUtil) {
     super();
   }
 
@@ -35,9 +32,7 @@ export default class WorkController extends AbstractController {
   public async get(data: WorkGetData): Promise<WorkGetResponse> {
     const models: Array<WorkModel> = await this.workRepository.get(data);
     return {
-      result: await Promise.all(
-        models.map(async (model) => await this.createWorkGetByIdResponse(model))
-      ),
+      result: await Promise.all(models.map(async (model) => await this.createWorkGetByIdResponse(model))),
     };
   }
 
@@ -50,9 +45,7 @@ export default class WorkController extends AbstractController {
     return await this.createWorkGetByIdResponse(model);
   }
 
-  private async createWorkGetByIdResponse(
-    model: WorkModel
-  ): Promise<WorkGetByIdResponse> {
+  private async createWorkGetByIdResponse(model: WorkModel): Promise<WorkGetByIdResponse> {
     return {
       id: model.id!,
       title: model.title,
@@ -64,10 +57,7 @@ export default class WorkController extends AbstractController {
             // url: await this.storageUtil.getSignedUrl(image.name),
             url: this.storageUtil.getPublicUrl(image.name),
             thumbnailUrl: {
-              small: await this.getThumbnailUrl(
-                image.name,
-                WorkController.IMAGE_SMALL_NAME_SUFFIX
-              ),
+              small: await this.getThumbnailUrl(image.name, WorkController.IMAGE_SMALL_NAME_SUFFIX),
             },
           };
         })
@@ -84,16 +74,14 @@ export default class WorkController extends AbstractController {
    */
   private async getThumbnailUrl(name: string, suffix: string) {
     // return await this.storageUtil.getSignedUrl(
-    return this.storageUtil.getPublicUrl(
-      this.storageUtil.addSuffix(name, suffix)
-    );
+    return this.storageUtil.getPublicUrl(this.storageUtil.addSuffix(name, suffix));
   }
 
   /**
    * 作品を登録する
    * @param data
    */
-  public async create(data: WorkCreateData) {
+  public async create(data: WorkCreateData): Promise<void> {
     const model: WorkModel = {
       ...data,
       publishedDate: this.workRepository.createTimestamp(data.publishedDate),
@@ -105,7 +93,7 @@ export default class WorkController extends AbstractController {
    * 作品を更新する
    * @param data
    */
-  public async update(data: WorkUpdateData) {
+  public async update(data: WorkUpdateData): Promise<void> {
     const model: WorkModel = {
       ...data,
       publishedDate: this.workRepository.createTimestamp(data.publishedDate),
@@ -113,29 +101,26 @@ export default class WorkController extends AbstractController {
     await this.workRepository.update(model);
   }
 
-  public async onUpdate(
-    change: functions.Change<functions.firestore.DocumentSnapshot>
-  ) {
+  /**
+   * 作品の更新時に実行する
+   * @param change
+   */
+  public async onUpdate(change: functions.Change<functions.firestore.DocumentSnapshot>): Promise<void> {
     const before = change.before.data() as WorkModel;
     const after = change.after.data() as WorkModel;
-    for (let beforeImage of before.images) {
-      if (
-        after.images.find((afterImage) => afterImage.name === beforeImage.name)
-      ) {
+
+    // 古い画像を削除する
+    for (const beforeImage of before.images) {
+      if (after.images.find((afterImage) => afterImage.name === beforeImage.name)) {
         continue;
       }
       await Promise.all(
-        [
-          beforeImage.name,
-          this.storageUtil.addSuffix(
-            beforeImage.name,
-            WorkController.IMAGE_SMALL_NAME_SUFFIX
-          ),
-        ].map((name) =>
-          this.storageUtil
-            .deleteFile(name)
-            .then(() => console.log(`"${name}" deleted.`))
-            .catch(() => console.error(`"${name}" failed to delete.`))
+        [beforeImage.name, this.storageUtil.addSuffix(beforeImage.name, WorkController.IMAGE_SMALL_NAME_SUFFIX)].map(
+          (name) =>
+            this.storageUtil
+              .deleteFile(name)
+              .then(() => console.log(`"${name}" deleted.`))
+              .catch(() => console.error(`"${name}" failed to delete.`))
         )
       );
     }
@@ -145,30 +130,33 @@ export default class WorkController extends AbstractController {
    * IDに紐づく作品を削除する
    * @param data
    */
-  public async deleteById(data: DeleteByIdData) {
+  public async deleteById(data: DeleteByIdData): Promise<void> {
     await this.workRepository.deleteById(data.id);
   }
 
-  public async onDelete(snapshot: functions.firestore.DocumentSnapshot) {
+  /**
+   * 作品の削除時に実行する
+   * @param snapshot
+   */
+  public async onDelete(snapshot: functions.firestore.DocumentSnapshot): Promise<void> {
     await this.storageUtil.deleteFiles(`works/${snapshot.id}`);
     console.log(`"works/${snapshot.id}" deleted.`);
   }
 
-  public async onUploadImageFile(object: functions.storage.ObjectMetadata) {
+  /**
+   * 画像のアップロード時に実行する
+   * @param object
+   * @returns
+   */
+  public async onUploadImageFile(object: functions.storage.ObjectMetadata): Promise<void> {
     const name = object.name!;
 
-    if (
-      name.includes(WorkController.IMAGE_SMALL_NAME_SUFFIX) ||
-      !this.storageUtil.isImageFile(object)
-    ) {
+    if (name.includes(WorkController.IMAGE_SMALL_NAME_SUFFIX) || !this.storageUtil.isImageFile(object)) {
       return;
     }
 
     // サムネイル画像（小）を生成する
-    let smallImageName = this.storageUtil.addSuffix(
-      name,
-      WorkController.IMAGE_SMALL_NAME_SUFFIX
-    );
+    const smallImageName = this.storageUtil.addSuffix(name, WorkController.IMAGE_SMALL_NAME_SUFFIX);
     if (!(await this.storageUtil.exists(smallImageName))) {
       await this.storageUtil.resizeImageFile(
         object,

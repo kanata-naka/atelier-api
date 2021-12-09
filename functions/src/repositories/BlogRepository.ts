@@ -2,7 +2,7 @@ import * as config from "config";
 import * as rssParser from "rss-parser";
 
 /**
- * ブログ（note）のリポジトリ
+ * ブログのリポジトリ
  */
 export default class BlogRepository {
   protected parser: rssParser;
@@ -20,9 +20,7 @@ export default class BlogRepository {
    * @param condition 条件
    */
   public async getArticles() {
-    const optout = await this.parser.parseURL(
-      `https://note.com/${config.get("note.username")}/rss`
-    );
+    const optout = await this.parser.parseURL(`https://note.com/${config.get("note.username")}/rss`);
     return optout.items;
   }
 }

@@ -110,7 +110,7 @@ export default class StorageUtil {
       pipeline
         .metadata()
         .then((data) => {
-          let resized: boolean = false;
+          let resized = false;
           const width = data.width;
           const height = data.height;
           if (!width || !height) {

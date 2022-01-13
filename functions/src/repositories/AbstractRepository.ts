@@ -1,5 +1,5 @@
 import * as admin from "firebase-admin";
-import * as uuidv4 from "uuid/v4";
+import { uuid } from "uuidv4";
 import AbstractModel from "../models/AbstractModel";
 
 /**
@@ -32,7 +32,7 @@ export default abstract class AbstractRepository<T extends AbstractModel> {
    * @param model
    */
   public async create(model: T): Promise<void> {
-    const documentRef = this.collectionRef.doc(model.id || uuidv4());
+    const documentRef = this.collectionRef.doc(model.id || uuid());
     delete model.id;
     await documentRef.set({
       createdAt: this.now,

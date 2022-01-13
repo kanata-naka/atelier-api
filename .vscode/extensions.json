@@ -1,5 +1,7 @@
 {
   "recommendations": [
+    "eg2.vscode-npm-script",
+    "dbaeumer.vscode-eslint",
     "esbenp.prettier-vscode"
   ]
 }

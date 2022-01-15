@@ -122,8 +122,11 @@ export default abstract class AbstractRepository<T extends AbstractModel> {
   /**
    * 現在日時を取得する
    */
-  protected get now(): FirebaseFirestore.FieldValue {
-    return admin.firestore.FieldValue.serverTimestamp();
+  // public get now(): FirebaseFirestore.FieldValue {
+  //   return admin.firestore.FieldValue.serverTimestamp();
+  // }
+  public get now(): FirebaseFirestore.Timestamp {
+    return admin.firestore.Timestamp.now();
   }
 
   /**

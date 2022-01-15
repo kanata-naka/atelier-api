@@ -7,7 +7,7 @@ export default class WorkModel extends AbstractModel {
   /** タイトル */
   title!: string;
   /** 出版日 */
-  publishedDate?: FirebaseFirestore.Timestamp;
+  publishedDate!: FirebaseFirestore.Timestamp;
   /** 画像の一覧 */
   images!: Array<{
     /** ストレージ上のパス */
@@ -16,5 +16,5 @@ export default class WorkModel extends AbstractModel {
   /** 説明 */
   description?: string;
   /** 公開範囲 */
-  restrict?: string = "0";
+  restrict!: string;
 }

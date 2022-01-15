@@ -1,4 +1,4 @@
-export default class BlogGetArticlesResponse {
+export default class BlogGetArticleListResponse {
   /** 取得結果 */
   result!: Array<{
     /** URL */

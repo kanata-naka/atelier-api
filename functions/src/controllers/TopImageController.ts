@@ -1,11 +1,11 @@
 import { injectable } from "tsyringe";
 import * as functions from "firebase-functions";
 import TopImageModel from "../models/TopImageModel";
-import TopImageGetByIdResponse from "../dto/TopImageGetByIdResponse";
+import TopImageGetResponse from "../dto/TopImageGetResponse";
 import AbstractController from "./AbstractController";
 import TopImageRepository from "../repositories/TopImageRepository";
 import StorageUtil from "../utils/StorageUtil";
-import TopImageGetResponse from "../dto/TopImageGetResponse";
+import TopImageGetListResponse from "../dto/TopImageGetListResponse";
 import GetByIdData from "../dto/GetByIdData";
 import TopImageCreateData from "../dto/TopImageCreateData";
 import TopImageBulkUpdateData from "../dto/TopImageBulkUpdateData";
@@ -28,10 +28,10 @@ export default class TopImageController extends AbstractController {
    * トップ画像の一覧を取得する
    * @param data
    */
-  public async get(): Promise<TopImageGetResponse> {
+  public async get(): Promise<TopImageGetListResponse> {
     const models: Array<TopImageModel> = await this.topImageRepository.get();
     return {
-      result: await Promise.all(models.map(async (model) => await this.createTopImageGetByIdResponse(model))),
+      result: await Promise.all(models.map(async (model) => await this.createTopImageGetResponse(model))),
     };
   }
 
@@ -39,12 +39,12 @@ export default class TopImageController extends AbstractController {
    * IDに紐づくトップ画像を取得する
    * @param data
    */
-  public async getById(data: GetByIdData): Promise<TopImageGetByIdResponse> {
+  public async getById(data: GetByIdData): Promise<TopImageGetResponse> {
     const model: TopImageModel = await this.topImageRepository.getById(data.id);
-    return await this.createTopImageGetByIdResponse(model);
+    return await this.createTopImageGetResponse(model);
   }
 
-  private async createTopImageGetByIdResponse(model: TopImageModel): Promise<TopImageGetByIdResponse> {
+  private async createTopImageGetResponse(model: TopImageModel): Promise<TopImageGetResponse> {
     return {
       id: model.id!,
       image: {
@@ -59,8 +59,8 @@ export default class TopImageController extends AbstractController {
       },
       description: model.description,
       order: model.order,
-      createdAt: model.createdAt?.seconds,
-      updatedAt: model.updatedAt?.seconds,
+      createdAt: model.createdAt!.seconds,
+      updatedAt: model.updatedAt!.seconds,
     };
   }
 

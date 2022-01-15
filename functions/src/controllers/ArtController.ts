@@ -1,12 +1,12 @@
 import { injectable } from "tsyringe";
 import * as functions from "firebase-functions";
 import ArtModel from "../models/ArtModel";
-import ArtGetByIdResponse from "../dto/ArtGetByIdResponse";
+import ArtGetResponse from "../dto/ArtGetResponse";
 import AbstractController from "./AbstractController";
 import ArtRepository from "../repositories/ArtRepository";
 import StorageUtil from "../utils/StorageUtil";
-import ArtGetResponse from "../dto/ArtGetResponse";
-import ArtGetData from "../dto/ArtGetData";
+import ArtGetListResponse from "../dto/ArtGetListResponse";
+import ArtGetListData from "../dto/ArtGetListData";
 import GetByIdData from "../dto/GetByIdData";
 import ArtCreateData from "../dto/ArtCreateData";
 import ArtUpdateData from "../dto/ArtUpdateData";
@@ -35,9 +35,9 @@ export default class ArtController extends AbstractController {
    * アートの一覧を取得する
    * @param data
    */
-  public async get(data: ArtGetData): Promise<ArtGetResponse> {
+  public async get(data: ArtGetListData): Promise<ArtGetListResponse> {
     const models: Array<ArtModel> = await this.artRepository.get(data);
-    const result = await Promise.all(models.map(async (model) => await this.createArtGetByIdResponse(model)));
+    const result = await Promise.all(models.map(async (model) => await this.createArtGetResponse(model)));
     return {
       result,
       fetchedAll: data && data.limit ? result.length < data.limit : false,
@@ -48,12 +48,12 @@ export default class ArtController extends AbstractController {
    * IDに紐づくアートを取得する
    * @param data
    */
-  public async getById(data: GetByIdData): Promise<ArtGetByIdResponse> {
+  public async getById(data: GetByIdData): Promise<ArtGetResponse> {
     const model: ArtModel = await this.artRepository.getById(data.id);
-    return await this.createArtGetByIdResponse(model);
+    return await this.createArtGetResponse(model);
   }
 
-  private async createArtGetByIdResponse(model: ArtModel): Promise<ArtGetByIdResponse> {
+  private async createArtGetResponse(model: ArtModel): Promise<ArtGetResponse> {
     return {
       id: model.id!,
       title: model.title,
@@ -73,8 +73,8 @@ export default class ArtController extends AbstractController {
       ),
       restrict: model.restrict,
       description: model.description,
-      createdAt: model.createdAt?.seconds,
-      updatedAt: model.updatedAt?.seconds,
+      createdAt: model.createdAt!.seconds,
+      updatedAt: model.updatedAt!.seconds,
     };
   }
 

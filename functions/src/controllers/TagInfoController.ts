@@ -1,7 +1,7 @@
 import { injectable } from "tsyringe";
 import TagInfoRepository from "../repositories/TagInfoRepository";
 import TagInfoModel from "../models/TagInfoModel";
-import TagInfoGetByIdResponse from "../dto/TagInfoGetByIdResponse";
+import TagInfoGetResponse from "../dto/TagInfoGetResponse";
 import AbstractController from "./AbstractController";
 import GetByIdData from "../dto/GetByIdData";
 
@@ -18,12 +18,10 @@ export default class TagInfoController extends AbstractController {
    * IDに紐づくタグ情報を取得する
    * @param data
    */
-  public async getById(data: GetByIdData): Promise<TagInfoGetByIdResponse> {
+  public async getById(data: GetByIdData): Promise<TagInfoGetResponse> {
     const model: TagInfoModel = await this.tagInfoRepository.getById(data.id);
     return {
       info: model.info,
-      createdAt: model.createdAt?.seconds,
-      updatedAt: model.updatedAt?.seconds,
     };
   }
 }

@@ -10,8 +10,8 @@ export default class ArtCreateData {
   }>;
   /** 説明 */
   description?: string;
-  /** ピックアップフラグ */
-  pickupFlag?: boolean = false;
+  /** 公開範囲 */
+  restrict!: string;
   /** 作成日時 */
   createdAt?: number;
 }

@@ -1,11 +1,11 @@
 import { injectable } from "tsyringe";
 import * as functions from "firebase-functions";
 import WorkModel from "../models/WorkModel";
-import WorkGetByIdResponse from "../dto/WorkGetByIdResponse";
+import WorkGetResponse from "../dto/WorkGetResponse";
 import AbstractController from "./AbstractController";
 import WorkRepository from "../repositories/WorkRepository";
 import StorageUtil from "../utils/StorageUtil";
-import WorkGetResponse from "../dto/WorkGetResponse";
+import WorkGetListResponse from "../dto/WorkGetListResponse";
 import WorkGetData from "../dto/WorkGetData";
 import GetByIdData from "../dto/GetByIdData";
 import WorkUpdateData from "../dto/WorkUpdateData";
@@ -29,10 +29,10 @@ export default class WorkController extends AbstractController {
    * 作品の一覧を取得する
    * @param data
    */
-  public async get(data: WorkGetData): Promise<WorkGetResponse> {
+  public async get(data: WorkGetData): Promise<WorkGetListResponse> {
     const models: Array<WorkModel> = await this.workRepository.get(data);
     return {
-      result: await Promise.all(models.map(async (model) => await this.createWorkGetByIdResponse(model))),
+      result: await Promise.all(models.map(async (model) => await this.createWorkGetResponse(model))),
     };
   }
 
@@ -40,16 +40,16 @@ export default class WorkController extends AbstractController {
    * IDに紐づく作品を取得する
    * @param data
    */
-  public async getById(data: GetByIdData): Promise<WorkGetByIdResponse> {
+  public async getById(data: GetByIdData): Promise<WorkGetResponse> {
     const model: WorkModel = await this.workRepository.getById(data.id);
-    return await this.createWorkGetByIdResponse(model);
+    return await this.createWorkGetResponse(model);
   }
 
-  private async createWorkGetByIdResponse(model: WorkModel): Promise<WorkGetByIdResponse> {
+  private async createWorkGetResponse(model: WorkModel): Promise<WorkGetResponse> {
     return {
       id: model.id!,
       title: model.title,
-      publishedDate: model.publishedDate?.seconds,
+      publishedDate: model.publishedDate.seconds,
       images: await Promise.all(
         model.images.map(async (image) => {
           return {
@@ -64,8 +64,8 @@ export default class WorkController extends AbstractController {
       ),
       description: model.description,
       restrict: model.restrict,
-      createdAt: model.createdAt?.seconds,
-      updatedAt: model.updatedAt?.seconds,
+      createdAt: model.createdAt!.seconds,
+      updatedAt: model.updatedAt!.seconds,
     };
   }
 

@@ -1,6 +1,6 @@
 import AbstractRepository from "./AbstractRepository";
 import WorkModel from "../models/WorkModel";
-import WorkGetListData from "../schemas/WorkGetListData";
+import WorkGetListCondition from "../schemas/WorkGetListCondition";
 
 /**
  * 作品のリポジトリ
@@ -14,15 +14,15 @@ export default class WorkRepository extends AbstractRepository<WorkModel> {
    * 作品の一覧を取得する
    * @param condition
    */
-  public async get(data: WorkGetListData): Promise<Array<WorkModel>> {
-    let query = this.collectionRef.orderBy(data.sort?.column || "createdAt", data.sort?.order || "desc");
-    if (data.restrict) {
+  public async get(condition: WorkGetListCondition): Promise<Array<WorkModel>> {
+    let query = this.collectionRef.orderBy(condition.sort?.column || "createdAt", condition.sort?.order || "desc");
+    if (condition.restrict) {
       // 条件：公開範囲
-      query = query.where("restrict", "in", data.restrict);
+      query = query.where("restrict", "in", condition.restrict);
     }
-    if (data.limit) {
+    if (condition.limit) {
       // 条件：一度に取得する最大件数
-      query = query.limit(data.limit);
+      query = query.limit(condition.limit);
     }
 
     return (await query.get()).docs.map((documentSnapshot) => {

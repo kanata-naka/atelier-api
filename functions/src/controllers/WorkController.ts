@@ -6,11 +6,11 @@ import AbstractController from "./AbstractController";
 import WorkRepository from "../repositories/WorkRepository";
 import StorageUtil from "../utils/StorageUtil";
 import WorkGetListResponse from "../schemas/WorkGetListResponse";
-import WorkGetData from "../schemas/WorkGetListData";
-import GetByIdData from "../schemas/GetByIdData";
-import WorkUpdateData from "../schemas/WorkUpdateData";
-import DeleteByIdData from "../schemas/DeleteByIdData";
-import WorkCreateData from "../schemas/WorkCreateData";
+import WorkGetRequest from "../schemas/WorkGetListRequest";
+import GetByIdRequest from "../schemas/GetByIdRequest";
+import WorkUpdateRequest from "../schemas/WorkUpdateRequest";
+import DeleteByIdRequest from "../schemas/DeleteByIdRequest";
+import WorkCreateRequest from "../schemas/WorkCreateRequest";
 
 /**
  * 作品のコントローラ
@@ -29,7 +29,7 @@ export default class WorkController extends AbstractController {
    * 作品の一覧を取得する
    * @param data
    */
-  public async get(data: WorkGetData): Promise<WorkGetListResponse> {
+  public async get(data: WorkGetRequest): Promise<WorkGetListResponse> {
     const models: Array<WorkModel> = await this.workRepository.get(data);
     return {
       result: await Promise.all(models.map(async (model) => await this.createWorkGetResponse(model))),
@@ -40,7 +40,7 @@ export default class WorkController extends AbstractController {
    * IDに紐づく作品を取得する
    * @param data
    */
-  public async getById(data: GetByIdData): Promise<WorkGetResponse> {
+  public async getById(data: GetByIdRequest): Promise<WorkGetResponse> {
     const model: WorkModel = await this.workRepository.getById(data.id);
     return await this.createWorkGetResponse(model);
   }
@@ -81,7 +81,7 @@ export default class WorkController extends AbstractController {
    * 作品を登録する
    * @param data
    */
-  public async create(data: WorkCreateData): Promise<void> {
+  public async create(data: WorkCreateRequest): Promise<void> {
     const model: WorkModel = {
       ...data,
       publishedDate: this.workRepository.createTimestamp(data.publishedDate),
@@ -93,7 +93,7 @@ export default class WorkController extends AbstractController {
    * 作品を更新する
    * @param data
    */
-  public async update(data: WorkUpdateData): Promise<void> {
+  public async update(data: WorkUpdateRequest): Promise<void> {
     const model: WorkModel = {
       ...data,
       publishedDate: this.workRepository.createTimestamp(data.publishedDate),
@@ -130,7 +130,7 @@ export default class WorkController extends AbstractController {
    * IDに紐づく作品を削除する
    * @param data
    */
-  public async deleteById(data: DeleteByIdData): Promise<void> {
+  public async deleteById(data: DeleteByIdRequest): Promise<void> {
     await this.workRepository.deleteById(data.id);
   }
 

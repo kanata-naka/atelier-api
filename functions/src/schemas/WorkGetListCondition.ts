@@ -1,6 +1,8 @@
-export default interface WorkGetData {
+import { Restrict } from "../types";
+
+export default interface WorkGetListCondition {
   /** 公開範囲 */
-  restrict?: string[];
+  restrict?: Restrict[];
   /** 一度に取得する最大件数 */
   limit?: number;
   /** ソート */
@@ -8,6 +10,6 @@ export default interface WorkGetData {
     /** ソート対象のカラム */
     column?: "publishedDate" | "createdAt";
     /** ソートの方向 */
-    order?: "asc" | "desc";
+    order?: FirebaseFirestore.OrderByDirection;
   };
 }

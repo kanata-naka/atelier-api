@@ -2,7 +2,7 @@ import { injectable } from "tsyringe";
 import BlogGetArticleListResponse from "../schemas/BlogGetArticleListResponse";
 import AbstractController from "./AbstractController";
 import BlogRepository from "../repositories/BlogRepository";
-import BlogGetArticleListData from "../schemas/BlogGetArticleListData";
+import BlogGetArticleListRequest from "../schemas/BlogGetArticleListRequest";
 
 /**
  * ブログのコントローラ
@@ -17,7 +17,7 @@ export default class BlogController extends AbstractController {
    * 記事の一覧を取得する
    * @param data
    */
-  public async getArticles(data: BlogGetArticleListData): Promise<BlogGetArticleListResponse> {
+  public async getArticles(data: BlogGetArticleListRequest): Promise<BlogGetArticleListResponse> {
     const items = await this.blogRepository.getArticles();
     let result = items!.map((item) => {
       // 最初の画像

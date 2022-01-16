@@ -1,3 +1,5 @@
+import { Restrict } from "../types";
+
 export default interface WorkGetResponse {
   /** ID */
   id: string;
@@ -20,7 +22,7 @@ export default interface WorkGetResponse {
   /** 説明 */
   description?: string;
   /** 公開範囲 */
-  restrict: string;
+  restrict: Restrict;
   /** 作成日時 */
   createdAt: number;
   /** 更新日時 */

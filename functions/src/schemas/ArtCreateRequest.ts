@@ -1,4 +1,6 @@
-export default interface ArtCreateData {
+import { Restrict } from "../types";
+
+export default interface ArtCreateRequest {
   /** タイトル */
   title: string;
   /** タグの一覧 */
@@ -11,7 +13,7 @@ export default interface ArtCreateData {
   /** 説明 */
   description?: string;
   /** 公開範囲 */
-  restrict: string;
+  restrict: Restrict;
   /** 作成日時 */
   createdAt?: number;
 }

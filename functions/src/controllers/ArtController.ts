@@ -6,11 +6,11 @@ import AbstractController from "./AbstractController";
 import ArtRepository from "../repositories/ArtRepository";
 import StorageUtil from "../utils/StorageUtil";
 import ArtGetListResponse from "../schemas/ArtGetListResponse";
-import ArtGetListData from "../schemas/ArtGetListData";
-import GetByIdData from "../schemas/GetByIdData";
-import ArtCreateData from "../schemas/ArtCreateData";
-import ArtUpdateData from "../schemas/ArtUpdateData";
-import DeleteByIdData from "../schemas/DeleteByIdData";
+import ArtGetListRequest from "../schemas/ArtGetListRequest";
+import GetByIdRequest from "../schemas/GetByIdRequest";
+import ArtCreateRequest from "../schemas/ArtCreateRequest";
+import ArtUpdateRequest from "../schemas/ArtUpdateRequest";
+import DeleteByIdRequest from "../schemas/DeleteByIdRequest";
 import TagInfoRepository from "../repositories/TagInfoRepository";
 
 /**
@@ -35,7 +35,7 @@ export default class ArtController extends AbstractController {
    * アートの一覧を取得する
    * @param data
    */
-  public async get(data: ArtGetListData): Promise<ArtGetListResponse> {
+  public async get(data: ArtGetListRequest): Promise<ArtGetListResponse> {
     const models: Array<ArtModel> = await this.artRepository.get(data);
     const result = await Promise.all(models.map(async (model) => await this.createArtGetResponse(model)));
     return {
@@ -48,7 +48,7 @@ export default class ArtController extends AbstractController {
    * IDに紐づくアートを取得する
    * @param data
    */
-  public async getById(data: GetByIdData): Promise<ArtGetResponse> {
+  public async getById(data: GetByIdRequest): Promise<ArtGetResponse> {
     const model: ArtModel = await this.artRepository.getById(data.id);
     return await this.createArtGetResponse(model);
   }
@@ -90,7 +90,7 @@ export default class ArtController extends AbstractController {
    * アートを登録する
    * @param data
    */
-  public async create(data: ArtCreateData): Promise<void> {
+  public async create(data: ArtCreateRequest): Promise<void> {
     const model: ArtModel = {
       ...data,
       createdAt: data.createdAt ? this.artRepository.createTimestamp(data.createdAt) : undefined,
@@ -104,7 +104,7 @@ export default class ArtController extends AbstractController {
    * アートを更新する
    * @param data
    */
-  public async update(data: ArtUpdateData): Promise<void> {
+  public async update(data: ArtUpdateRequest): Promise<void> {
     const model: ArtModel = {
       ...data,
       createdAt: data.createdAt ? this.artRepository.createTimestamp(data.createdAt) : undefined,
@@ -146,7 +146,7 @@ export default class ArtController extends AbstractController {
    * IDに紐づくアートを削除する
    * @param data
    */
-  public async deleteById(data: DeleteByIdData): Promise<void> {
+  public async deleteById(data: DeleteByIdRequest): Promise<void> {
     await this.artRepository.deleteById(data.id);
     // タグ情報を更新する
     await this.tagInfoRepository.aggregateById("arts");

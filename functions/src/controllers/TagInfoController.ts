@@ -3,7 +3,7 @@ import TagInfoRepository from "../repositories/TagInfoRepository";
 import TagInfoModel from "../models/TagInfoModel";
 import TagInfoGetResponse from "../schemas/TagInfoGetResponse";
 import AbstractController from "./AbstractController";
-import GetByIdData from "../schemas/GetByIdData";
+import GetByIdRequest from "../schemas/GetByIdRequest";
 
 /**
  * タグ情報のコントローラ
@@ -18,7 +18,7 @@ export default class TagInfoController extends AbstractController {
    * IDに紐づくタグ情報を取得する
    * @param data
    */
-  public async getById(data: GetByIdData): Promise<TagInfoGetResponse> {
+  public async getById(data: GetByIdRequest): Promise<TagInfoGetResponse> {
     const model: TagInfoModel = await this.tagInfoRepository.getById(data.id);
     return {
       info: model.info,

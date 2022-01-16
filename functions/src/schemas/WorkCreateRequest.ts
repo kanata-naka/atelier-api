@@ -1,4 +1,6 @@
-export default interface WorkCreateData {
+import { Restrict } from "../types";
+
+export default interface WorkCreateRequest {
   /** タイトル */
   title: string;
   /** 出版日 */
@@ -11,5 +13,5 @@ export default interface WorkCreateData {
   /** 説明 */
   description?: string;
   /** 公開範囲 */
-  restrict: string;
+  restrict: Restrict;
 }

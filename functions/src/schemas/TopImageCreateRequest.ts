@@ -1,4 +1,4 @@
-export default interface TopImageCreateData {
+export default interface TopImageCreateRequest {
   /** 画像 */
   image: {
     /** ストレージ上のパス */

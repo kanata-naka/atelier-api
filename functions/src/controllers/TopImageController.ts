@@ -6,10 +6,10 @@ import AbstractController from "./AbstractController";
 import TopImageRepository from "../repositories/TopImageRepository";
 import StorageUtil from "../utils/StorageUtil";
 import TopImageGetListResponse from "../schemas/TopImageGetListResponse";
-import GetByIdData from "../schemas/GetByIdData";
-import TopImageCreateData from "../schemas/TopImageCreateData";
-import TopImageBulkUpdateData from "../schemas/TopImageBulkUpdateData";
-import DeleteByIdData from "../schemas/DeleteByIdData";
+import GetByIdRequest from "../schemas/GetByIdRequest";
+import TopImageCreateRequest from "../schemas/TopImageCreateRequest";
+import TopImageBulkUpdateRequest from "../schemas/TopImageBulkUpdateRequest";
+import DeleteByIdRequest from "../schemas/DeleteByIdRequest";
 
 /**
  * トップ画像のコントローラ
@@ -39,7 +39,7 @@ export default class TopImageController extends AbstractController {
    * IDに紐づくトップ画像を取得する
    * @param data
    */
-  public async getById(data: GetByIdData): Promise<TopImageGetResponse> {
+  public async getById(data: GetByIdRequest): Promise<TopImageGetResponse> {
     const model: TopImageModel = await this.topImageRepository.getById(data.id);
     return await this.createTopImageGetResponse(model);
   }
@@ -68,7 +68,7 @@ export default class TopImageController extends AbstractController {
    * トップ画像を登録する
    * @param data
    */
-  public async create(data: TopImageCreateData): Promise<void> {
+  public async create(data: TopImageCreateRequest): Promise<void> {
     await this.topImageRepository.create(data);
   }
 
@@ -76,7 +76,7 @@ export default class TopImageController extends AbstractController {
    * トップ画像を一括で更新する
    * @param data
    */
-  public async bulkUpdate(data: TopImageBulkUpdateData): Promise<void> {
+  public async bulkUpdate(data: TopImageBulkUpdateRequest): Promise<void> {
     await this.topImageRepository.bulkUpdate(data);
   }
 
@@ -107,7 +107,7 @@ export default class TopImageController extends AbstractController {
    * IDに紐づくトップ画像を削除する
    * @param data
    */
-  public async deleteById(data: DeleteByIdData): Promise<void> {
+  public async deleteById(data: DeleteByIdRequest): Promise<void> {
     await this.topImageRepository.deleteById(data.id);
   }
 

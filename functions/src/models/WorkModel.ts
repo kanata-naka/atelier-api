@@ -1,3 +1,4 @@
+import { Restrict } from "../types";
 import BaseModel from "./BaseModel";
 
 /**
@@ -16,5 +17,5 @@ export default interface WorkModel extends BaseModel {
   /** 説明 */
   description?: string;
   /** 公開範囲 */
-  restrict: string;
+  restrict: Restrict;
 }

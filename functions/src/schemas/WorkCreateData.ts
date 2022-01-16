@@ -1,15 +1,15 @@
-export default class WorkCreateData {
+export default interface WorkCreateData {
   /** タイトル */
-  title!: string;
+  title: string;
   /** 出版日 */
-  publishedDate!: number;
+  publishedDate: number;
   /** 画像の一覧 */
-  images!: Array<{
+  images: Array<{
     /** ストレージ上のパス */
     name: string;
   }>;
   /** 説明 */
   description?: string;
   /** 公開範囲 */
-  restrict!: string;
+  restrict: string;
 }

@@ -7,7 +7,6 @@ module.exports = {
         "eslint:recommended",
         "plugin:@typescript-eslint/recommended",
         "prettier",
-        // "prettier/@typescript-eslint"
     ],
     "parser": "@typescript-eslint/parser",
     "parserOptions": {
@@ -17,5 +16,11 @@ module.exports = {
     "plugins": [
         "eslint-plugin-import",
         "@typescript-eslint"
-    ]
+    ],
+    "rules": {
+        "@typescript-eslint/no-namespace": "off",
+        "@typescript-eslint/no-empty-function": "off",
+        "@typescript-eslint/no-empty-interface": "off",
+        "@typescript-eslint/no-non-null-assertion": "off"
+    }
 };

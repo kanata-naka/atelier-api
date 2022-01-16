@@ -1,8 +1,8 @@
 import { injectable } from "tsyringe";
-import BlogGetArticleListResponse from "../dto/BlogGetArticleListResponse";
+import BlogGetArticleListResponse from "../schemas/BlogGetArticleListResponse";
 import AbstractController from "./AbstractController";
 import BlogRepository from "../repositories/BlogRepository";
-import BlogGetArticleListData from "../dto/BlogGetArticleListData";
+import BlogGetArticleListData from "../schemas/BlogGetArticleListData";
 
 /**
  * ブログのコントローラ

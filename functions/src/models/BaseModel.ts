@@ -1,7 +1,7 @@
 /**
  * モデルの基底クラス
  */
-export default abstract class AbstractModel {
+export default interface BaseModel {
   /** ID */
   id?: string;
   /** 作成日時 */

@@ -1,15 +1,15 @@
 import { injectable } from "tsyringe";
 import * as functions from "firebase-functions";
 import TopImageModel from "../models/TopImageModel";
-import TopImageGetResponse from "../dto/TopImageGetResponse";
+import TopImageGetResponse from "../schemas/TopImageGetResponse";
 import AbstractController from "./AbstractController";
 import TopImageRepository from "../repositories/TopImageRepository";
 import StorageUtil from "../utils/StorageUtil";
-import TopImageGetListResponse from "../dto/TopImageGetListResponse";
-import GetByIdData from "../dto/GetByIdData";
-import TopImageCreateData from "../dto/TopImageCreateData";
-import TopImageBulkUpdateData from "../dto/TopImageBulkUpdateData";
-import DeleteByIdData from "../dto/DeleteByIdData";
+import TopImageGetListResponse from "../schemas/TopImageGetListResponse";
+import GetByIdData from "../schemas/GetByIdData";
+import TopImageCreateData from "../schemas/TopImageCreateData";
+import TopImageBulkUpdateData from "../schemas/TopImageBulkUpdateData";
+import DeleteByIdData from "../schemas/DeleteByIdData";
 
 /**
  * トップ画像のコントローラ

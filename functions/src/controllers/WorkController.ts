@@ -1,16 +1,16 @@
 import { injectable } from "tsyringe";
 import * as functions from "firebase-functions";
 import WorkModel from "../models/WorkModel";
-import WorkGetResponse from "../dto/WorkGetResponse";
+import WorkGetResponse from "../schemas/WorkGetResponse";
 import AbstractController from "./AbstractController";
 import WorkRepository from "../repositories/WorkRepository";
 import StorageUtil from "../utils/StorageUtil";
-import WorkGetListResponse from "../dto/WorkGetListResponse";
-import WorkGetData from "../dto/WorkGetData";
-import GetByIdData from "../dto/GetByIdData";
-import WorkUpdateData from "../dto/WorkUpdateData";
-import DeleteByIdData from "../dto/DeleteByIdData";
-import WorkCreateData from "../dto/WorkCreateData";
+import WorkGetListResponse from "../schemas/WorkGetListResponse";
+import WorkGetData from "../schemas/WorkGetListData";
+import GetByIdData from "../schemas/GetByIdData";
+import WorkUpdateData from "../schemas/WorkUpdateData";
+import DeleteByIdData from "../schemas/DeleteByIdData";
+import WorkCreateData from "../schemas/WorkCreateData";
 
 /**
  * 作品のコントローラ

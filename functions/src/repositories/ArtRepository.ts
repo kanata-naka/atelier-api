@@ -1,6 +1,6 @@
 import AbstractRepository from "./AbstractRepository";
 import ArtModel from "../models/ArtModel";
-import ArtGetCondition from "../dto/ArtGetCondition";
+import ArtGetListData from "../schemas/ArtGetListData";
 
 /**
  * アートのリポジトリ
@@ -12,26 +12,26 @@ export default class ArtRepository extends AbstractRepository<ArtModel> {
 
   /**
    * アートの一覧を取得する
-   * @param condition
+   * @param data
    */
-  public async get(condition: ArtGetCondition): Promise<Array<ArtModel>> {
+  public async get(data: ArtGetListData): Promise<Array<ArtModel>> {
     // 作成日時の降順で取得する
     let query = this.collectionRef.orderBy("createdAt", "desc");
-    if (condition.tag) {
+    if (data.tag) {
       // 条件：タグ
-      query = query.where("tags", "array-contains", condition.tag);
+      query = query.where("tags", "array-contains", data.tag);
     }
-    if (condition.restrict) {
+    if (data.restrict) {
       // 条件：公開範囲
-      query = query.where("restrict", "in", condition.restrict);
+      query = query.where("restrict", "in", data.restrict);
     }
-    if (condition.lastId) {
+    if (data.lastId) {
       // 条件：最後のID（自動スクロール用）
-      query = query.startAfter(await this.collectionRef.doc(condition.lastId).get());
+      query = query.startAfter(await this.collectionRef.doc(data.lastId).get());
     }
-    if (condition.limit) {
+    if (data.limit) {
       // 条件：一度に取得する最大件数
-      query = query.limit(condition.limit);
+      query = query.limit(data.limit);
     }
 
     return (await query.get()).docs.map((documentSnapshot) => {

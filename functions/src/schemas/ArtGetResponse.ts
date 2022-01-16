@@ -1,12 +1,12 @@
-export default class WorkGetResponse {
+export default interface ArtGetResponse {
   /** ID */
-  id!: string;
+  id: string;
   /** タイトル */
-  title!: string;
-  /** 出版日 */
-  publishedDate!: number;
+  title: string;
+  /** タグの一覧 */
+  tags?: Array<string>;
   /** 画像の一覧 */
-  images?: Array<{
+  images: Array<{
     /** ストレージ上のパス */
     name: string;
     /** 画像のURL */
@@ -15,14 +15,16 @@ export default class WorkGetResponse {
     thumbnailUrl: {
       /** サムネイル画像（小）のURL */
       small: string;
+      /** サムネイル画像（中）のURL */
+      medium: string;
     };
   }>;
   /** 説明 */
   description?: string;
   /** 公開範囲 */
-  restrict!: string;
+  restrict: string;
   /** 作成日時 */
-  createdAt!: number;
+  createdAt: number;
   /** 更新日時 */
-  updatedAt!: number;
+  updatedAt: number;
 }

@@ -1,20 +1,20 @@
-import AbstractModel from "./AbstractModel";
+import BaseModel from "./BaseModel";
 
 /**
  * 作品のモデル
  */
-export default class WorkModel extends AbstractModel {
+export default interface WorkModel extends BaseModel {
   /** タイトル */
-  title!: string;
+  title: string;
   /** 出版日 */
-  publishedDate!: FirebaseFirestore.Timestamp;
+  publishedDate: FirebaseFirestore.Timestamp;
   /** 画像の一覧 */
-  images!: Array<{
+  images: Array<{
     /** ストレージ上のパス */
     name: string;
   }>;
   /** 説明 */
   description?: string;
   /** 公開範囲 */
-  restrict!: string;
+  restrict: string;
 }

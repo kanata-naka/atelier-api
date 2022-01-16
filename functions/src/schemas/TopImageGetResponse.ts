@@ -1,15 +1,15 @@
-export default class TopImageGetResponse {
+export default interface TopImageGetResponse {
   /** ID */
-  id!: string;
+  id: string;
   /** 画像 */
-  image!: {
+  image: {
     /** ストレージ上のパス */
     name: string;
     /** 画像のURL */
     url: string;
   };
   /** サムネイル画像 */
-  thumbnailImage!: {
+  thumbnailImage: {
     /** ストレージ上のパス */
     name: string;
     /** 画像のURL */
@@ -18,9 +18,9 @@ export default class TopImageGetResponse {
   /** 説明 */
   description?: string;
   /** 表示順 */
-  order!: number;
+  order: number;
   /** 作成日時 */
-  createdAt!: number;
+  createdAt: number;
   /** 更新日時 */
-  updatedAt!: number;
+  updatedAt: number;
 }

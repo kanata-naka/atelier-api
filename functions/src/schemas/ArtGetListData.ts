@@ -1,7 +1,4 @@
-/**
- * アートの一覧を取得する条件
- */
-export default class ArtGetCondition {
+export default interface ArtGetListData {
   /** タグ */
   tag?: string;
   /** 公開範囲 */

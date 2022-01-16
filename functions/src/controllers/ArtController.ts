@@ -1,16 +1,16 @@
 import { injectable } from "tsyringe";
 import * as functions from "firebase-functions";
 import ArtModel from "../models/ArtModel";
-import ArtGetResponse from "../dto/ArtGetResponse";
+import ArtGetResponse from "../schemas/ArtGetResponse";
 import AbstractController from "./AbstractController";
 import ArtRepository from "../repositories/ArtRepository";
 import StorageUtil from "../utils/StorageUtil";
-import ArtGetListResponse from "../dto/ArtGetListResponse";
-import ArtGetListData from "../dto/ArtGetListData";
-import GetByIdData from "../dto/GetByIdData";
-import ArtCreateData from "../dto/ArtCreateData";
-import ArtUpdateData from "../dto/ArtUpdateData";
-import DeleteByIdData from "../dto/DeleteByIdData";
+import ArtGetListResponse from "../schemas/ArtGetListResponse";
+import ArtGetListData from "../schemas/ArtGetListData";
+import GetByIdData from "../schemas/GetByIdData";
+import ArtCreateData from "../schemas/ArtCreateData";
+import ArtUpdateData from "../schemas/ArtUpdateData";
+import DeleteByIdData from "../schemas/DeleteByIdData";
 import TagInfoRepository from "../repositories/TagInfoRepository";
 
 /**

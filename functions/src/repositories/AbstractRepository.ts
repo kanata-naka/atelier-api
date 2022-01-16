@@ -1,11 +1,11 @@
 import * as admin from "firebase-admin";
 import { uuid } from "uuidv4";
-import AbstractModel from "../models/AbstractModel";
+import BaseModel from "../models/BaseModel";
 
 /**
  * リポジトリの基底クラス
  */
-export default abstract class AbstractRepository<T extends AbstractModel> {
+export default abstract class AbstractRepository<T extends BaseModel> {
   protected collectionRef: FirebaseFirestore.CollectionReference;
 
   constructor(collectionPath: string) {
@@ -63,7 +63,7 @@ export default abstract class AbstractRepository<T extends AbstractModel> {
     const snapshot = await this.collectionRef.get();
     let count = 0;
     await Promise.all(
-      snapshot.docs.map(async (documentSnapshot, index) => {
+      snapshot.docs.map(async (documentSnapshot) => {
         const model = models.find((_model) => documentSnapshot.id === _model.id);
         if (!model) {
           return;
@@ -102,7 +102,7 @@ export default abstract class AbstractRepository<T extends AbstractModel> {
     const snapshot = await this.collectionRef.get();
     let count = 0;
     await Promise.all(
-      snapshot.docs.map(async (documentSnapshot, index) => {
+      snapshot.docs.map(async (documentSnapshot) => {
         if (!ids.find((id) => documentSnapshot.id === id)) {
           return;
         }

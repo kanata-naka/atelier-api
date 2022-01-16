@@ -1,6 +1,6 @@
-export default class BlogGetArticleListResponse {
+export default interface BlogGetArticleListResponse {
   /** 取得結果 */
-  result!: Array<{
+  result: Array<{
     /** URL */
     url: string;
     /** タイトル */

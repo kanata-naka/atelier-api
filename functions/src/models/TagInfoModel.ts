@@ -1,13 +1,13 @@
-import AbstractModel from "./AbstractModel";
+import BaseModel from "./BaseModel";
 
 /**
  * タグ情報のモデル
  */
-export default class TagInfoModel extends AbstractModel {
+export default interface TagInfoModel extends BaseModel {
   info: Array<{
     /** タグ名 */
     name: string;
     /** 件数 */
     count: number;
-  }> = [];
+  }>;
 }

@@ -2,13 +2,14 @@
   "name": "atelier-api",
   "description": "",
   "scripts": {
-    "lint": "eslint src/**/*.ts",
     "build": "tsc",
     "serve": "npm run build && firebase serve",
     "shell": "npm run build && firebase functions:shell",
     "deploy": "firebase deploy",
     "logs": "firebase functions:log",
-    "prettier": "prettier src/**/*.ts --write"
+    "format": "prettier --write src/**/*.ts",
+    "lint": "eslint src/**/*.ts",
+    "lint:fix": "eslint --fix src/**/*.ts"
   },
   "engines": {
     "node": "16"

@@ -7,9 +7,9 @@ import BaseModel from "./BaseModel";
 export default interface ArtModel extends BaseModel {
   /** タイトル */
   title: string;
-  /** タグの一覧 */
+  /** タグ一覧 */
   tags?: Array<string>;
-  /** 画像の一覧 */
+  /** 画像一覧 */
   images: Array<{
     /** ストレージ上のパス */
     name: string;

@@ -5,7 +5,7 @@ export default interface WorkCreateRequest {
   title: string;
   /** 出版日 */
   publishedDate: number;
-  /** 画像の一覧 */
+  /** 画像一覧 */
   images: Array<{
     /** ストレージ上のパス */
     name: string;

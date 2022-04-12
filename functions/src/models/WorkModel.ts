@@ -9,7 +9,7 @@ export default interface WorkModel extends BaseModel {
   title: string;
   /** 出版日 */
   publishedDate: FirebaseFirestore.Timestamp;
-  /** 画像の一覧 */
+  /** 画像一覧 */
   images: Array<{
     /** ストレージ上のパス */
     name: string;

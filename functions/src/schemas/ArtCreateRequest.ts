@@ -3,9 +3,9 @@ import { Restrict } from "../types";
 export default interface ArtCreateRequest {
   /** タイトル */
   title: string;
-  /** タグの一覧 */
+  /** タグ一覧 */
   tags?: Array<string>;
-  /** 画像の一覧 */
+  /** 画像一覧 */
   images: Array<{
     /** ストレージ上のパス */
     name: string;

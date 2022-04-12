@@ -1,9 +1,9 @@
 import { injectable } from "tsyringe";
-import TagInfoRepository from "../repositories/TagInfoRepository";
 import TagInfoModel from "../models/TagInfoModel";
+import TagInfoRepository from "../repositories/TagInfoRepository";
+import GetByIdRequest from "../schemas/GetByIdRequest";
 import TagInfoGetResponse from "../schemas/TagInfoGetResponse";
 import AbstractController from "./AbstractController";
-import GetByIdRequest from "../schemas/GetByIdRequest";
 
 /**
  * タグ情報のコントローラ

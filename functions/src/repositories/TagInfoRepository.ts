@@ -1,6 +1,6 @@
 import * as admin from "firebase-admin";
-import AbstractRepository from "./AbstractRepository";
 import TagInfoModel from "../models/TagInfoModel";
+import AbstractRepository from "./AbstractRepository";
 
 /**
  * タグ情報のリポジトリ

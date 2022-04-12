@@ -1,5 +1,5 @@
-import AbstractRepository from "./AbstractRepository";
 import TopImageModel from "../models/TopImageModel";
+import AbstractRepository from "./AbstractRepository";
 
 /**
  * トップ画像のリポジトリ

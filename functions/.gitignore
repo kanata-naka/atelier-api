@@ -1,5 +1,2 @@
-## Compiled JavaScript files
+# Compiled JavaScript files
 dist/
-
-# Typescript v1 declaration files
-typings/

@@ -1,8 +1,8 @@
 import ArtGetResponse from "./ArtGetResponse";
 
-export default class ArtGetListResponse {
+export default interface ArtGetListResponse {
   /** 取得結果 */
-  result!: Array<ArtGetResponse>;
+  result: Array<ArtGetResponse>;
   /** 最後まで取得されたか */
-  fetchedAll!: boolean;
+  fetchedAll: boolean;
 }

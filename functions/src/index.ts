@@ -1,24 +1,18 @@
 import "reflect-metadata";
-import * as config from "config";
 import * as admin from "firebase-admin";
 import * as functions from "firebase-functions";
-import { SUPPORTED_REGIONS } from "firebase-functions/lib/function-configuration";
 import { HttpsError } from "firebase-functions/lib/providers/https";
 import { container } from "tsyringe";
-import TopImageController from "./controllers/TopImageController";
+import ArtController from "./controllers/ArtController";
 import BlogController from "./controllers/BlogController";
 import TagInfoController from "./controllers/TagInfoController";
-import ArtController from "./controllers/ArtController";
+import TopImageController from "./controllers/TopImageController";
 import WorkController from "./controllers/WorkController";
 
 // Firebase Admin SDK を初期化する
-admin.initializeApp({
-  credential: admin.credential.cert(config.get("firebase.serviceAccount")),
-  databaseURL: config.get("firebase.databaseURL"),
-  storageBucket: config.get("firebase.storageBucket"),
-});
+admin.initializeApp();
 
-const region: typeof SUPPORTED_REGIONS[number] = config.get("firebase.region");
+const region: string = process.env.FIREBASE_REGION!;
 
 /**
  * 管理者権限を持っているかを判定する

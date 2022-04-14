@@ -1,4 +1,5 @@
 import * as rssParser from "rss-parser";
+import { BLOG_RSS_URL } from "../constants/blog";
 
 /**
  * ブログのリポジトリ
@@ -19,7 +20,7 @@ export default class BlogRepository {
    * @param condition 条件
    */
   public async getArticles() {
-    const optout = await this.parser.parseURL(process.env.BLOG_RSS_URL!);
+    const optout = await this.parser.parseURL(BLOG_RSS_URL);
     return optout.items;
   }
 }

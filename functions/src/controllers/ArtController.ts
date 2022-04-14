@@ -1,5 +1,11 @@
 import * as functions from "firebase-functions";
 import { injectable } from "tsyringe";
+import {
+  IMAGE_MEDIUM_MAX_WIDTH,
+  IMAGE_MEDIUM_NAME_SUFFIX,
+  IMAGE_SMALL_MAX_WIDTH,
+  IMAGE_SMALL_NAME_SUFFIX,
+} from "../constants/arts";
 import ArtModel from "../models/ArtModel";
 import ArtRepository from "../repositories/ArtRepository";
 import TagInfoRepository from "../repositories/TagInfoRepository";
@@ -18,11 +24,6 @@ import AbstractController from "./AbstractController";
  */
 @injectable()
 export default class ArtController extends AbstractController {
-  private static readonly IMAGE_SMALL_NAME_SUFFIX: string = "_small";
-  private static readonly IMAGE_SMALL_MAX_WIDTH: number = 64;
-  private static readonly IMAGE_MEDIUM_NAME_SUFFIX: string = "_medium";
-  private static readonly IMAGE_MEDIUM_MAX_WIDTH: number = 720;
-
   constructor(
     private artRepository: ArtRepository,
     private tagInfoRepository: TagInfoRepository,
@@ -65,8 +66,8 @@ export default class ArtController extends AbstractController {
             // url: await this.storageUtil.getSignedUrl(image.name),
             url: this.storageUtil.getPublicUrl(image.name),
             thumbnailUrl: {
-              small: await this.getThumbnailUrl(image.name, ArtController.IMAGE_SMALL_NAME_SUFFIX),
-              medium: await this.getThumbnailUrl(image.name, ArtController.IMAGE_MEDIUM_NAME_SUFFIX),
+              small: await this.getThumbnailUrl(image.name, IMAGE_SMALL_NAME_SUFFIX),
+              medium: await this.getThumbnailUrl(image.name, IMAGE_MEDIUM_NAME_SUFFIX),
             },
           };
         })
@@ -130,8 +131,8 @@ export default class ArtController extends AbstractController {
       await Promise.all(
         [
           beforeImage.name,
-          this.storageUtil.addSuffix(beforeImage.name, ArtController.IMAGE_SMALL_NAME_SUFFIX),
-          this.storageUtil.addSuffix(beforeImage.name, ArtController.IMAGE_MEDIUM_NAME_SUFFIX),
+          this.storageUtil.addSuffix(beforeImage.name, IMAGE_SMALL_NAME_SUFFIX),
+          this.storageUtil.addSuffix(beforeImage.name, IMAGE_MEDIUM_NAME_SUFFIX),
         ].map((name) =>
           this.storageUtil
             .deleteFile(name)
@@ -168,7 +169,7 @@ export default class ArtController extends AbstractController {
   public async onUploadImageFile(object: functions.storage.ObjectMetadata): Promise<void> {
     const name = object.name!;
 
-    if (name.includes(ArtController.IMAGE_SMALL_NAME_SUFFIX) || name.includes(ArtController.IMAGE_MEDIUM_NAME_SUFFIX)) {
+    if (name.includes(IMAGE_SMALL_NAME_SUFFIX) || name.includes(IMAGE_MEDIUM_NAME_SUFFIX)) {
       return;
     }
     if (!this.storageUtil.isImageFile(object)) {
@@ -177,22 +178,22 @@ export default class ArtController extends AbstractController {
     await this.storageUtil.makePublic(name);
 
     // サムネイル画像（小）を生成する
-    const smallImageName = this.storageUtil.addSuffix(name, ArtController.IMAGE_SMALL_NAME_SUFFIX);
+    const smallImageName = this.storageUtil.addSuffix(name, IMAGE_SMALL_NAME_SUFFIX);
     await this.storageUtil.resizeImageFile(
       object,
-      ArtController.IMAGE_SMALL_MAX_WIDTH,
-      ArtController.IMAGE_SMALL_MAX_WIDTH,
+      IMAGE_SMALL_MAX_WIDTH,
+      IMAGE_SMALL_MAX_WIDTH,
       "inside",
       smallImageName
     );
     await this.storageUtil.makePublic(smallImageName);
 
     // サムネイル画像（中）を生成する
-    const mediumImageName = this.storageUtil.addSuffix(name, ArtController.IMAGE_MEDIUM_NAME_SUFFIX);
+    const mediumImageName = this.storageUtil.addSuffix(name, IMAGE_MEDIUM_NAME_SUFFIX);
     await this.storageUtil.resizeImageFile(
       object,
-      ArtController.IMAGE_MEDIUM_MAX_WIDTH,
-      ArtController.IMAGE_MEDIUM_MAX_WIDTH,
+      IMAGE_MEDIUM_MAX_WIDTH,
+      IMAGE_MEDIUM_MAX_WIDTH,
       "inside",
       mediumImageName
     );

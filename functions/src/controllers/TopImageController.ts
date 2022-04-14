@@ -1,5 +1,6 @@
 import * as functions from "firebase-functions";
 import { injectable } from "tsyringe";
+import { IMAGE_MAX_HEIGHT, IMAGE_MAX_WIDTH, THUMBNAIL_IMAGE_MAX_WIDTH } from "../constants/topImages";
 import TopImageModel from "../models/TopImageModel";
 import TopImageRepository from "../repositories/TopImageRepository";
 import DeleteByIdRequest from "../schemas/DeleteByIdRequest";
@@ -16,10 +17,6 @@ import AbstractController from "./AbstractController";
  */
 @injectable()
 export default class TopImageController extends AbstractController {
-  private static readonly IMAGE_MAX_WIDTH: number = 1600;
-  private static readonly IMAGE_MAX_HEIGHT: number = 960;
-  private static readonly THUMBNAIL_IMAGE_MAX_WIDTH: number = 32;
-
   constructor(private topImageRepository: TopImageRepository, private storageUtil: StorageUtil) {
     super();
   }
@@ -127,22 +124,12 @@ export default class TopImageController extends AbstractController {
   public async onUploadImageFile(object: functions.storage.ObjectMetadata): Promise<void> {
     if (
       !this.storageUtil.isImageFile(object) ||
-      !(await this.storageUtil.needToResizeImageFile(
-        object,
-        TopImageController.IMAGE_MAX_WIDTH,
-        TopImageController.IMAGE_MAX_HEIGHT,
-        "cover"
-      ))
+      !(await this.storageUtil.needToResizeImageFile(object, IMAGE_MAX_WIDTH, IMAGE_MAX_HEIGHT, "cover"))
     ) {
       return;
     }
     // 画像をリサイズする
-    await this.storageUtil.resizeImageFile(
-      object,
-      TopImageController.IMAGE_MAX_WIDTH,
-      TopImageController.IMAGE_MAX_HEIGHT,
-      "cover"
-    );
+    await this.storageUtil.resizeImageFile(object, IMAGE_MAX_WIDTH, IMAGE_MAX_HEIGHT, "cover");
     await this.storageUtil.makePublic(object.name!);
   }
 
@@ -155,20 +142,15 @@ export default class TopImageController extends AbstractController {
       !this.storageUtil.isImageFile(object) ||
       !(await this.storageUtil.needToResizeImageFile(
         object,
-        TopImageController.THUMBNAIL_IMAGE_MAX_WIDTH,
-        TopImageController.THUMBNAIL_IMAGE_MAX_WIDTH,
+        THUMBNAIL_IMAGE_MAX_WIDTH,
+        THUMBNAIL_IMAGE_MAX_WIDTH,
         "cover"
       ))
     ) {
       return;
     }
     // サムネイル画像をリサイズする
-    await this.storageUtil.resizeImageFile(
-      object,
-      TopImageController.THUMBNAIL_IMAGE_MAX_WIDTH,
-      TopImageController.THUMBNAIL_IMAGE_MAX_WIDTH,
-      "cover"
-    );
+    await this.storageUtil.resizeImageFile(object, THUMBNAIL_IMAGE_MAX_WIDTH, THUMBNAIL_IMAGE_MAX_WIDTH, "cover");
     await this.storageUtil.makePublic(object.name!);
   }
 }

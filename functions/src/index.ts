@@ -3,6 +3,7 @@ import * as admin from "firebase-admin";
 import * as functions from "firebase-functions";
 import { HttpsError } from "firebase-functions/lib/providers/https";
 import { container } from "tsyringe";
+import { FIREBASE_REGION } from "./constants";
 import ArtController from "./controllers/ArtController";
 import BlogController from "./controllers/BlogController";
 import TagInfoController from "./controllers/TagInfoController";
@@ -11,8 +12,6 @@ import WorkController from "./controllers/WorkController";
 
 // Firebase Admin SDK を初期化する
 admin.initializeApp();
-
-const region: string = process.env.FIREBASE_REGION!;
 
 /**
  * 管理者権限を持っているかを判定する
@@ -28,38 +27,38 @@ const hasAdminUserClaim = async (context: functions.https.CallableContext) => {
 };
 
 export const topImages = {
-  get: functions.region(region).https.onCall(async () => {
+  get: functions.region(FIREBASE_REGION).https.onCall(async () => {
     return await container.resolve(TopImageController).get();
   }),
-  getById: functions.region(region).https.onCall(async (data) => {
+  getById: functions.region(FIREBASE_REGION).https.onCall(async (data) => {
     return await container.resolve(TopImageController).getById(data);
   }),
-  create: functions.region(region).https.onCall(async (data, context) => {
+  create: functions.region(FIREBASE_REGION).https.onCall(async (data, context) => {
     if (!(await hasAdminUserClaim(context))) {
       throw new HttpsError("unauthenticated", "");
     }
     await container.resolve(TopImageController).create(data);
   }),
-  bulkUpdate: functions.region(region).https.onCall(async (data, context) => {
+  bulkUpdate: functions.region(FIREBASE_REGION).https.onCall(async (data, context) => {
     if (!(await hasAdminUserClaim(context))) {
       throw new HttpsError("unauthenticated", "");
     }
     await container.resolve(TopImageController).bulkUpdate(data);
   }),
   onUpdate: functions
-    .region(region)
+    .region(FIREBASE_REGION)
     .firestore.document("topImages/{id}")
     .onUpdate(async (change) => {
       await container.resolve(TopImageController).onUpdate(change);
     }),
-  deleteById: functions.region(region).https.onCall(async (data, context) => {
+  deleteById: functions.region(FIREBASE_REGION).https.onCall(async (data, context) => {
     if (!(await hasAdminUserClaim(context))) {
       throw new HttpsError("unauthenticated", "");
     }
     await container.resolve(TopImageController).deleteById(data);
   }),
   onDelete: functions
-    .region(region)
+    .region(FIREBASE_REGION)
     .firestore.document("topImages/{id}")
     .onDelete(async (snapshot) => {
       await container.resolve(TopImageController).onDelete(snapshot);
@@ -67,50 +66,50 @@ export const topImages = {
 };
 
 export const blog = {
-  getArticles: functions.region(region).https.onCall(async (data) => {
+  getArticles: functions.region(FIREBASE_REGION).https.onCall(async (data) => {
     return await container.resolve(BlogController).getArticles(data);
   }),
 };
 
 export const tagInfo = {
-  getById: functions.region(region).https.onCall(async (data) => {
+  getById: functions.region(FIREBASE_REGION).https.onCall(async (data) => {
     return await container.resolve(TagInfoController).getById(data);
   }),
 };
 
 export const arts = {
-  get: functions.region(region).https.onCall(async (data) => {
+  get: functions.region(FIREBASE_REGION).https.onCall(async (data) => {
     return await container.resolve(ArtController).get(data);
   }),
-  getById: functions.region(region).https.onCall(async (data) => {
+  getById: functions.region(FIREBASE_REGION).https.onCall(async (data) => {
     return await container.resolve(ArtController).getById(data);
   }),
-  create: functions.region(region).https.onCall(async (data, context) => {
+  create: functions.region(FIREBASE_REGION).https.onCall(async (data, context) => {
     if (!(await hasAdminUserClaim(context))) {
       throw new HttpsError("unauthenticated", "");
     }
     await container.resolve(ArtController).create(data);
   }),
-  update: functions.region(region).https.onCall(async (data, context) => {
+  update: functions.region(FIREBASE_REGION).https.onCall(async (data, context) => {
     if (!(await hasAdminUserClaim(context))) {
       throw new HttpsError("unauthenticated", "");
     }
     await container.resolve(ArtController).update(data);
   }),
   onUpdate: functions
-    .region(region)
+    .region(FIREBASE_REGION)
     .firestore.document("arts/{id}")
     .onUpdate(async (change) => {
       await container.resolve(ArtController).onUpdate(change);
     }),
-  deleteById: functions.region(region).https.onCall(async (data, context) => {
+  deleteById: functions.region(FIREBASE_REGION).https.onCall(async (data, context) => {
     if (!(await hasAdminUserClaim(context))) {
       throw new HttpsError("unauthenticated", "");
     }
     await container.resolve(ArtController).deleteById(data);
   }),
   onDelete: functions
-    .region(region)
+    .region(FIREBASE_REGION)
     .firestore.document("arts/{id}")
     .onDelete(async (snapshot) => {
       await container.resolve(ArtController).onDelete(snapshot);
@@ -118,38 +117,38 @@ export const arts = {
 };
 
 export const works = {
-  get: functions.region(region).https.onCall(async (data) => {
+  get: functions.region(FIREBASE_REGION).https.onCall(async (data) => {
     return await container.resolve(WorkController).get(data);
   }),
-  getById: functions.region(region).https.onCall(async (data) => {
+  getById: functions.region(FIREBASE_REGION).https.onCall(async (data) => {
     return await container.resolve(WorkController).getById(data);
   }),
-  create: functions.region(region).https.onCall(async (data, context) => {
+  create: functions.region(FIREBASE_REGION).https.onCall(async (data, context) => {
     if (!(await hasAdminUserClaim(context))) {
       throw new HttpsError("unauthenticated", "");
     }
     await container.resolve(WorkController).create(data);
   }),
-  update: functions.region(region).https.onCall(async (data, context) => {
+  update: functions.region(FIREBASE_REGION).https.onCall(async (data, context) => {
     if (!(await hasAdminUserClaim(context))) {
       throw new HttpsError("unauthenticated", "");
     }
     await container.resolve(WorkController).update(data);
   }),
   onUpdate: functions
-    .region(region)
+    .region(FIREBASE_REGION)
     .firestore.document("works/{id}")
     .onUpdate(async (change) => {
       await container.resolve(WorkController).onUpdate(change);
     }),
-  deleteById: functions.region(region).https.onCall(async (data, context) => {
+  deleteById: functions.region(FIREBASE_REGION).https.onCall(async (data, context) => {
     if (!(await hasAdminUserClaim(context))) {
       throw new HttpsError("unauthenticated", "");
     }
     await container.resolve(WorkController).deleteById(data);
   }),
   onDelete: functions
-    .region(region)
+    .region(FIREBASE_REGION)
     .firestore.document("works/{id}")
     .onDelete(async (snapshot) => {
       await container.resolve(WorkController).onDelete(snapshot);
@@ -158,7 +157,7 @@ export const works = {
 
 export const adminUsers = {
   onCreate: functions
-    .region(region)
+    .region(FIREBASE_REGION)
     .firestore.document("admin_users/{id}")
     .onCreate(async (snapshot) => {
       const adminUser = snapshot.data();
@@ -167,7 +166,7 @@ export const adminUsers = {
       }
     }),
   onDelete: functions
-    .region(region)
+    .region(FIREBASE_REGION)
     .firestore.document("admin_users/{id}")
     .onDelete(async (snapshot) => {
       const adminUser = snapshot.data();
@@ -180,7 +179,7 @@ export const adminUsers = {
 export const storage = {
   onUploadFile: functions
     .runWith({ memory: "512MB" })
-    .region(region)
+    .region(FIREBASE_REGION)
     .storage.object()
     .onFinalize(async (object) => {
       if (object.name?.match(/topImages\/(.+?)\/image\/(.+)/g)) {

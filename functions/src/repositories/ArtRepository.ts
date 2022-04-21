@@ -3,7 +3,7 @@ import ArtGetListCondition from "../schemas/ArtGetListCondition";
 import AbstractRepository from "./AbstractRepository";
 
 /**
- * アートのリポジトリ
+ * イラストのリポジトリ
  */
 export default class ArtRepository extends AbstractRepository<ArtModel> {
   constructor() {
@@ -11,7 +11,7 @@ export default class ArtRepository extends AbstractRepository<ArtModel> {
   }
 
   /**
-   * アートの一覧を取得する
+   * イラストの一覧を取得する
    * @param data
    */
   public async get(condition: ArtGetListCondition): Promise<Array<ArtModel>> {

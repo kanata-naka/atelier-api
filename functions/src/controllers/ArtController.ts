@@ -20,7 +20,7 @@ import StorageUtil from "../utils/StorageUtil";
 import AbstractController from "./AbstractController";
 
 /**
- * アートのコントローラ
+ * イラストのコントローラ
  */
 @injectable()
 export default class ArtController extends AbstractController {
@@ -33,7 +33,7 @@ export default class ArtController extends AbstractController {
   }
 
   /**
-   * アートの一覧を取得する
+   * イラストの一覧を取得する
    * @param data
    */
   public async get(data: ArtGetListRequest): Promise<ArtGetListResponse> {
@@ -46,7 +46,7 @@ export default class ArtController extends AbstractController {
   }
 
   /**
-   * IDに紐づくアートを取得する
+   * IDに紐づくイラストを取得する
    * @param data
    */
   public async getById(data: GetByIdRequest): Promise<ArtGetResponse> {
@@ -88,7 +88,7 @@ export default class ArtController extends AbstractController {
   }
 
   /**
-   * アートを登録する
+   * イラストを登録する
    * @param data
    */
   public async create(data: ArtCreateRequest): Promise<void> {
@@ -102,7 +102,7 @@ export default class ArtController extends AbstractController {
   }
 
   /**
-   * アートを更新する
+   * イラストを更新する
    * @param data
    */
   public async update(data: ArtUpdateRequest): Promise<void> {
@@ -116,7 +116,7 @@ export default class ArtController extends AbstractController {
   }
 
   /**
-   * アートの更新時に実行する
+   * イラストの更新時に実行する
    * @param change
    */
   public async onUpdate(change: functions.Change<functions.firestore.DocumentSnapshot>): Promise<void> {
@@ -144,7 +144,7 @@ export default class ArtController extends AbstractController {
   }
 
   /**
-   * IDに紐づくアートを削除する
+   * IDに紐づくイラストを削除する
    * @param data
    */
   public async deleteById(data: DeleteByIdRequest): Promise<void> {
@@ -154,7 +154,7 @@ export default class ArtController extends AbstractController {
   }
 
   /**
-   * アートの削除時に実行する
+   * イラストの削除時に実行する
    * @param snapshot
    */
   public async onDelete(snapshot: functions.firestore.DocumentSnapshot): Promise<void> {

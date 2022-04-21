@@ -2,7 +2,7 @@ import { Restrict } from "../types";
 import BaseModel from "./BaseModel";
 
 /**
- * アートのモデル
+ * イラストのモデル
  */
 export default interface ArtModel extends BaseModel {
   /** タイトル */

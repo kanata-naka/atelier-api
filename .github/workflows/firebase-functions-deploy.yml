@@ -18,6 +18,7 @@ jobs:
         with:
           workload_identity_provider: 'projects/362277105499/locations/global/workloadIdentityPools/github/providers/atelier-api'
           service_account: 'firebase-adminsdk-baddz@atelier-4464b.iam.gserviceaccount.com'
+      - uses: actions/setup-node@v4
       - run: cd functions
       - run: npm ci
       - run: npm i -g firebase-tools

@@ -5,19 +5,12 @@ import { HttpsError } from "firebase-functions/lib/providers/https";
 import { container } from "tsyringe";
 import { FIREBASE_REGION } from "./constants";
 import ArtController from "./controllers/ArtController";
-import BlogController from "./controllers/BlogController";
 import TagInfoController from "./controllers/TagInfoController";
 import TopImageController from "./controllers/TopImageController";
 import WorkController from "./controllers/WorkController";
 
-// Firebase Admin SDK を初期化する
 admin.initializeApp();
 
-/**
- * 管理者権限を持っているかを判定する
- * @param context
- * @returns
- */
 const hasAdminUserClaim = async (context: functions.https.CallableContext) => {
   if (!context.auth) {
     return false;
@@ -63,12 +56,6 @@ export const topImages = {
     .onDelete(async (snapshot) => {
       await container.resolve(TopImageController).onDelete(snapshot);
     }),
-};
-
-export const blog = {
-  getArticles: functions.region(FIREBASE_REGION).https.onCall(async (data) => {
-    return await container.resolve(BlogController).getArticles(data);
-  }),
 };
 
 export const tagInfo = {

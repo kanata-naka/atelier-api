@@ -21,13 +21,16 @@ module.exports = {
     "import/order": [
       "warn",
       {
+        "alphabetize": {
+          "order": "asc",
+          "caseInsensitive": true
+        },
         "groups": ["builtin", "external", "internal"],
         "newlines-between": "never",
-        "alphabetize": { "order": "asc", "caseInsensitive": true },
       },
     ],
-    "@typescript-eslint/no-namespace": "off",
     "@typescript-eslint/no-empty-interface": "off",
+    "@typescript-eslint/no-namespace": "off",
     "@typescript-eslint/no-non-null-assertion": "off",
   },
 };

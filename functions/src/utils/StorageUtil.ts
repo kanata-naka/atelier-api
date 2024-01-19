@@ -3,9 +3,6 @@ import * as admin from "firebase-admin";
 import * as functions from "firebase-functions";
 import * as sharp from "sharp";
 
-/**
- * ストレージのユーティリティ
- */
 export default class StorageUtil {
   private static readonly PUBLIC_URL_BASE: string = "https://storage.googleapis.com";
 
@@ -15,67 +12,26 @@ export default class StorageUtil {
     this.bucket = admin.storage().bucket();
   }
 
-  /**
-   * ファイルが存在するかを判定する
-   */
   public async exists(name: string) {
     return (await this.bucket.file(name).exists())[0];
   }
 
-  /**
-   * ファイルの公開URLを取得する
-   * @param name
-   */
   public getPublicUrl(name: string) {
     return `${StorageUtil.PUBLIC_URL_BASE}/${this.bucket.name}/${name}`;
   }
 
-  /**
-   * ファイルを一般公開する
-   */
   public async makePublic(name: string) {
     await this.bucket.file(name).makePublic();
   }
 
-  /**
-   * ファイルのURLの有効期限を取得する
-   */
-  private static getExpiredDate() {
-    // 現在日の1日後とする
-    const result = new Date();
-    result.setDate(result.getDate() + 1);
-    return result;
-  }
-
-  /**
-   * ファイルの認証済みURLを取得する
-   */
-  public getSignedUrl(name: string) {
-    const file = this.bucket.file(name);
-    return new Promise<string>((resolve, reject) => {
-      file.getSignedUrl({ action: "read", expires: StorageUtil.getExpiredDate() }, (error, url) =>
-        url ? resolve(url) : reject()
-      );
-    });
-  }
-
-  /**
-   * ストレージからファイルを削除する
-   */
   public async deleteFile(name: string) {
     await this.bucket.file(name).delete();
   }
 
-  /**
-   * ストレージからディレクトリとその配下のファイルを全て削除する
-   */
   public async deleteFiles(directory: string) {
     await this.bucket.deleteFiles({ directory });
   }
 
-  /**
-   * 画像ファイルかを判定する
-   */
   public isImageFile(object: functions.storage.ObjectMetadata): boolean {
     const name = object.name!;
     const contentType = object.contentType;
@@ -86,17 +42,11 @@ export default class StorageUtil {
     return true;
   }
 
-  /**
-   * ファイル名にサフィックス（接尾辞）を追加する
-   */
   public addSuffix(name: string, suffix: string): string {
     const index: number = name.lastIndexOf(".");
     return name.slice(0, index) + suffix + name.slice(index);
   }
 
-  /**
-   * 画像ファイルのリサイズが必要かを判定する
-   */
   public async needToResizeImageFile(
     object: functions.storage.ObjectMetadata,
     destinationWidth: number,
@@ -141,9 +91,6 @@ export default class StorageUtil {
     });
   }
 
-  /**
-   * 画像ファイルをリサイズする
-   */
   public resizeImageFile(
     object: functions.storage.ObjectMetadata,
     destinationWidth: number,

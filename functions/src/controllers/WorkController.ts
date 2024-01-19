@@ -1,6 +1,6 @@
 import * as functions from "firebase-functions";
 import { injectable } from "tsyringe";
-import { IMAGE_MAX_WIDTH, IMAGE_SMALL_MAX_WIDTH, IMAGE_SMALL_NAME_SUFFIX } from "../constants/works";
+import { WORK_IMAGE_MAX_WIDTH, WORK_IMAGE_SMALL_MAX_WIDTH, WORK_IMAGE_SMALL_NAME_SUFFIX } from "../constants";
 import WorkModel from "../models/WorkModel";
 import WorkRepository from "../repositories/WorkRepository";
 import DeleteByIdRequest from "../schemas/DeleteByIdRequest";
@@ -22,10 +22,6 @@ export default class WorkController extends AbstractController {
     super();
   }
 
-  /**
-   * 作品の一覧を取得する
-   * @param data
-   */
   public async get(data: WorkGetRequest): Promise<WorkGetListResponse> {
     const models: Array<WorkModel> = await this.workRepository.get(data);
     return {
@@ -33,10 +29,6 @@ export default class WorkController extends AbstractController {
     };
   }
 
-  /**
-   * IDに紐づく作品を取得する
-   * @param data
-   */
   public async getById(data: GetByIdRequest): Promise<WorkGetResponse> {
     const model: WorkModel = await this.workRepository.getById(data.id);
     return await this.createWorkGetResponse(model);
@@ -51,10 +43,9 @@ export default class WorkController extends AbstractController {
         model.images.map(async (image) => {
           return {
             name: image.name,
-            // url: await this.storageUtil.getSignedUrl(image.name),
             url: this.storageUtil.getPublicUrl(image.name),
             thumbnailUrl: {
-              small: await this.getThumbnailUrl(image.name, IMAGE_SMALL_NAME_SUFFIX),
+              small: await this.getThumbnailUrl(image.name, WORK_IMAGE_SMALL_NAME_SUFFIX),
             },
           };
         })
@@ -66,18 +57,10 @@ export default class WorkController extends AbstractController {
     };
   }
 
-  /**
-   * サムネイル画像のURLを取得する
-   */
   private async getThumbnailUrl(name: string, suffix: string) {
-    // return await this.storageUtil.getSignedUrl(
     return this.storageUtil.getPublicUrl(this.storageUtil.addSuffix(name, suffix));
   }
 
-  /**
-   * 作品を登録する
-   * @param data
-   */
   public async create(data: WorkCreateRequest): Promise<void> {
     const model: WorkModel = {
       ...data,
@@ -86,10 +69,6 @@ export default class WorkController extends AbstractController {
     await this.workRepository.create(model);
   }
 
-  /**
-   * 作品を更新する
-   * @param data
-   */
   public async update(data: WorkUpdateRequest): Promise<void> {
     const model: WorkModel = {
       ...data,
@@ -98,10 +77,6 @@ export default class WorkController extends AbstractController {
     await this.workRepository.update(model);
   }
 
-  /**
-   * 作品の更新時に実行する
-   * @param change
-   */
   public async onUpdate(change: functions.Change<functions.firestore.DocumentSnapshot>): Promise<void> {
     const before = change.before.data() as WorkModel;
     const after = change.after.data() as WorkModel;
@@ -112,7 +87,7 @@ export default class WorkController extends AbstractController {
         continue;
       }
       await Promise.all(
-        [beforeImage.name, this.storageUtil.addSuffix(beforeImage.name, IMAGE_SMALL_NAME_SUFFIX)].map((name) =>
+        [beforeImage.name, this.storageUtil.addSuffix(beforeImage.name, WORK_IMAGE_SMALL_NAME_SUFFIX)].map((name) =>
           this.storageUtil
             .deleteFile(name)
             .then(() => console.log(`"${name}" deleted.`))
@@ -122,42 +97,29 @@ export default class WorkController extends AbstractController {
     }
   }
 
-  /**
-   * IDに紐づく作品を削除する
-   * @param data
-   */
   public async deleteById(data: DeleteByIdRequest): Promise<void> {
     await this.workRepository.deleteById(data.id);
   }
 
-  /**
-   * 作品の削除時に実行する
-   * @param snapshot
-   */
   public async onDelete(snapshot: functions.firestore.DocumentSnapshot): Promise<void> {
     await this.storageUtil.deleteFiles(`works/${snapshot.id}`);
     console.log(`"works/${snapshot.id}" deleted.`);
   }
 
-  /**
-   * 画像のアップロード時に実行する
-   * @param object
-   * @returns
-   */
   public async onUploadImageFile(object: functions.storage.ObjectMetadata): Promise<void> {
     const name = object.name!;
 
-    if (name.includes(IMAGE_SMALL_NAME_SUFFIX) || !this.storageUtil.isImageFile(object)) {
+    if (name.includes(WORK_IMAGE_SMALL_NAME_SUFFIX) || !this.storageUtil.isImageFile(object)) {
       return;
     }
 
     // サムネイル画像（小）を生成する
-    const smallImageName = this.storageUtil.addSuffix(name, IMAGE_SMALL_NAME_SUFFIX);
+    const smallImageName = this.storageUtil.addSuffix(name, WORK_IMAGE_SMALL_NAME_SUFFIX);
     if (!(await this.storageUtil.exists(smallImageName))) {
       await this.storageUtil.resizeImageFile(
         object,
-        IMAGE_SMALL_MAX_WIDTH,
-        IMAGE_SMALL_MAX_WIDTH,
+        WORK_IMAGE_SMALL_MAX_WIDTH,
+        WORK_IMAGE_SMALL_MAX_WIDTH,
         "inside",
         smallImageName
       );
@@ -165,8 +127,8 @@ export default class WorkController extends AbstractController {
     }
 
     // 画像をリサイズする
-    if (await this.storageUtil.needToResizeImageFile(object, IMAGE_MAX_WIDTH, IMAGE_MAX_WIDTH, "inside")) {
-      await this.storageUtil.resizeImageFile(object, IMAGE_MAX_WIDTH, IMAGE_MAX_WIDTH, "inside");
+    if (await this.storageUtil.needToResizeImageFile(object, WORK_IMAGE_MAX_WIDTH, WORK_IMAGE_MAX_WIDTH, "inside")) {
+      await this.storageUtil.resizeImageFile(object, WORK_IMAGE_MAX_WIDTH, WORK_IMAGE_MAX_WIDTH, "inside");
       await this.storageUtil.makePublic(name);
     }
   }

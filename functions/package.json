@@ -42,8 +42,5 @@
   },
   "engines": {
     "node": "16"
-  },
-  "eslintIgnore": [
-    ".eslintrc.js"
-  ]
+  }
 }

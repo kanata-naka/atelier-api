@@ -1,11 +1,11 @@
 import * as functions from "firebase-functions";
 import { injectable } from "tsyringe";
 import {
-  IMAGE_MEDIUM_MAX_WIDTH,
-  IMAGE_MEDIUM_NAME_SUFFIX,
-  IMAGE_SMALL_MAX_WIDTH,
-  IMAGE_SMALL_NAME_SUFFIX,
-} from "../constants/arts";
+  ART_IMAGE_MEDIUM_MAX_WIDTH,
+  ART_IMAGE_MEDIUM_NAME_SUFFIX,
+  ART_IMAGE_SMALL_MAX_WIDTH,
+  ART_IMAGE_SMALL_NAME_SUFFIX,
+} from "../constants";
 import ArtModel from "../models/ArtModel";
 import ArtRepository from "../repositories/ArtRepository";
 import TagInfoRepository from "../repositories/TagInfoRepository";
@@ -19,9 +19,6 @@ import GetByIdRequest from "../schemas/GetByIdRequest";
 import StorageUtil from "../utils/StorageUtil";
 import AbstractController from "./AbstractController";
 
-/**
- * イラストのコントローラ
- */
 @injectable()
 export default class ArtController extends AbstractController {
   constructor(
@@ -32,10 +29,6 @@ export default class ArtController extends AbstractController {
     super();
   }
 
-  /**
-   * イラストの一覧を取得する
-   * @param data
-   */
   public async get(data: ArtGetListRequest): Promise<ArtGetListResponse> {
     const models: Array<ArtModel> = await this.artRepository.get(data);
     const result = await Promise.all(models.map(async (model) => await this.createArtGetResponse(model)));
@@ -45,10 +38,6 @@ export default class ArtController extends AbstractController {
     };
   }
 
-  /**
-   * IDに紐づくイラストを取得する
-   * @param data
-   */
   public async getById(data: GetByIdRequest): Promise<ArtGetResponse> {
     const model: ArtModel = await this.artRepository.getById(data.id);
     return await this.createArtGetResponse(model);
@@ -63,11 +52,10 @@ export default class ArtController extends AbstractController {
         model.images.map(async (image) => {
           return {
             name: image.name,
-            // url: await this.storageUtil.getSignedUrl(image.name),
             url: this.storageUtil.getPublicUrl(image.name),
             thumbnailUrl: {
-              small: await this.getThumbnailUrl(image.name, IMAGE_SMALL_NAME_SUFFIX),
-              medium: await this.getThumbnailUrl(image.name, IMAGE_MEDIUM_NAME_SUFFIX),
+              small: await this.getThumbnailUrl(image.name, ART_IMAGE_SMALL_NAME_SUFFIX),
+              medium: await this.getThumbnailUrl(image.name, ART_IMAGE_MEDIUM_NAME_SUFFIX),
             },
           };
         })
@@ -79,46 +67,30 @@ export default class ArtController extends AbstractController {
     };
   }
 
-  /**
-   * サムネイル画像のURLを取得する
-   */
   private async getThumbnailUrl(name: string, suffix: string): Promise<string> {
-    // return await this.storageUtil.getSignedUrl(
     return this.storageUtil.getPublicUrl(this.storageUtil.addSuffix(name, suffix));
   }
 
-  /**
-   * イラストを登録する
-   * @param data
-   */
   public async create(data: ArtCreateRequest): Promise<void> {
     const model: ArtModel = {
       ...data,
       createdAt: data.createdAt ? this.artRepository.createTimestamp(data.createdAt) : undefined,
     };
     await this.artRepository.create(model);
-    // タグ情報を更新する
+    // タグ情報を最新化する
     await this.tagInfoRepository.aggregateById("arts");
   }
 
-  /**
-   * イラストを更新する
-   * @param data
-   */
   public async update(data: ArtUpdateRequest): Promise<void> {
     const model: ArtModel = {
       ...data,
       createdAt: data.createdAt ? this.artRepository.createTimestamp(data.createdAt) : undefined,
     };
     await this.artRepository.update(model);
-    // タグ情報を更新する
+    // タグ情報を最新化する
     await this.tagInfoRepository.aggregateById("arts");
   }
 
-  /**
-   * イラストの更新時に実行する
-   * @param change
-   */
   public async onUpdate(change: functions.Change<functions.firestore.DocumentSnapshot>): Promise<void> {
     const before = change.before.data() as ArtModel;
     const after = change.after.data() as ArtModel;
@@ -131,8 +103,8 @@ export default class ArtController extends AbstractController {
       await Promise.all(
         [
           beforeImage.name,
-          this.storageUtil.addSuffix(beforeImage.name, IMAGE_SMALL_NAME_SUFFIX),
-          this.storageUtil.addSuffix(beforeImage.name, IMAGE_MEDIUM_NAME_SUFFIX),
+          this.storageUtil.addSuffix(beforeImage.name, ART_IMAGE_SMALL_NAME_SUFFIX),
+          this.storageUtil.addSuffix(beforeImage.name, ART_IMAGE_MEDIUM_NAME_SUFFIX),
         ].map((name) =>
           this.storageUtil
             .deleteFile(name)
@@ -143,33 +115,21 @@ export default class ArtController extends AbstractController {
     }
   }
 
-  /**
-   * IDに紐づくイラストを削除する
-   * @param data
-   */
   public async deleteById(data: DeleteByIdRequest): Promise<void> {
     await this.artRepository.deleteById(data.id);
-    // タグ情報を更新する
+    // タグ情報を最新化する
     await this.tagInfoRepository.aggregateById("arts");
   }
 
-  /**
-   * イラストの削除時に実行する
-   * @param snapshot
-   */
   public async onDelete(snapshot: functions.firestore.DocumentSnapshot): Promise<void> {
     await this.storageUtil.deleteFiles(`arts/${snapshot.id}`);
     console.log(`"arts/${snapshot.id}" deleted.`);
   }
 
-  /**
-   * 画像のアップロード時に実行する
-   * @param object
-   */
   public async onUploadImageFile(object: functions.storage.ObjectMetadata): Promise<void> {
     const name = object.name!;
 
-    if (name.includes(IMAGE_SMALL_NAME_SUFFIX) || name.includes(IMAGE_MEDIUM_NAME_SUFFIX)) {
+    if (name.includes(ART_IMAGE_SMALL_NAME_SUFFIX) || name.includes(ART_IMAGE_MEDIUM_NAME_SUFFIX)) {
       return;
     }
     if (!this.storageUtil.isImageFile(object)) {
@@ -178,22 +138,22 @@ export default class ArtController extends AbstractController {
     await this.storageUtil.makePublic(name);
 
     // サムネイル画像（小）を生成する
-    const smallImageName = this.storageUtil.addSuffix(name, IMAGE_SMALL_NAME_SUFFIX);
+    const smallImageName = this.storageUtil.addSuffix(name, ART_IMAGE_SMALL_NAME_SUFFIX);
     await this.storageUtil.resizeImageFile(
       object,
-      IMAGE_SMALL_MAX_WIDTH,
-      IMAGE_SMALL_MAX_WIDTH,
+      ART_IMAGE_SMALL_MAX_WIDTH,
+      ART_IMAGE_SMALL_MAX_WIDTH,
       "inside",
       smallImageName
     );
     await this.storageUtil.makePublic(smallImageName);
 
     // サムネイル画像（中）を生成する
-    const mediumImageName = this.storageUtil.addSuffix(name, IMAGE_MEDIUM_NAME_SUFFIX);
+    const mediumImageName = this.storageUtil.addSuffix(name, ART_IMAGE_MEDIUM_NAME_SUFFIX);
     await this.storageUtil.resizeImageFile(
       object,
-      IMAGE_MEDIUM_MAX_WIDTH,
-      IMAGE_MEDIUM_MAX_WIDTH,
+      ART_IMAGE_MEDIUM_MAX_WIDTH,
+      ART_IMAGE_MEDIUM_MAX_WIDTH,
       "inside",
       mediumImageName
     );

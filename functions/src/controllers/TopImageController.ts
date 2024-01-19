@@ -1,6 +1,6 @@
 import * as functions from "firebase-functions";
 import { injectable } from "tsyringe";
-import { IMAGE_MAX_HEIGHT, IMAGE_MAX_WIDTH, THUMBNAIL_IMAGE_MAX_WIDTH } from "../constants/topImages";
+import { TOP_IMAGE_MAX_HEIGHT, TOP_IMAGE_MAX_WIDTH, TOP_IMAGE_THUMBNAIL_MAX_WIDTH } from "../constants";
 import TopImageModel from "../models/TopImageModel";
 import TopImageRepository from "../repositories/TopImageRepository";
 import DeleteByIdRequest from "../schemas/DeleteByIdRequest";
@@ -12,19 +12,12 @@ import TopImageGetResponse from "../schemas/TopImageGetResponse";
 import StorageUtil from "../utils/StorageUtil";
 import AbstractController from "./AbstractController";
 
-/**
- * トップ画像のコントローラ
- */
 @injectable()
 export default class TopImageController extends AbstractController {
   constructor(private topImageRepository: TopImageRepository, private storageUtil: StorageUtil) {
     super();
   }
 
-  /**
-   * トップ画像の一覧を取得する
-   * @param data
-   */
   public async get(): Promise<TopImageGetListResponse> {
     const models: Array<TopImageModel> = await this.topImageRepository.get();
     return {
@@ -32,10 +25,6 @@ export default class TopImageController extends AbstractController {
     };
   }
 
-  /**
-   * IDに紐づくトップ画像を取得する
-   * @param data
-   */
   public async getById(data: GetByIdRequest): Promise<TopImageGetResponse> {
     const model: TopImageModel = await this.topImageRepository.getById(data.id);
     return await this.createTopImageGetResponse(model);
@@ -46,12 +35,10 @@ export default class TopImageController extends AbstractController {
       id: model.id!,
       image: {
         name: model.image.name,
-        // url: await this.storageUtil.getSignedUrl(model.image.name),
         url: this.storageUtil.getPublicUrl(model.image.name),
       },
       thumbnailImage: {
         name: model.thumbnailImage.name,
-        // url: await this.storageUtil.getSignedUrl(model.thumbnailImage.name),
         url: this.storageUtil.getPublicUrl(model.thumbnailImage.name),
       },
       description: model.description,
@@ -61,26 +48,14 @@ export default class TopImageController extends AbstractController {
     };
   }
 
-  /**
-   * トップ画像を登録する
-   * @param data
-   */
   public async create(data: TopImageCreateRequest): Promise<void> {
     await this.topImageRepository.create(data);
   }
 
-  /**
-   * トップ画像を一括で更新する
-   * @param data
-   */
   public async bulkUpdate(data: TopImageBulkUpdateRequest): Promise<void> {
     await this.topImageRepository.bulkUpdate(data);
   }
 
-  /**
-   * トップ画像の更新時に実行する
-   * @param change
-   */
   public async onUpdate(change: functions.Change<functions.firestore.DocumentSnapshot>): Promise<void> {
     const before = change.before.data() as TopImageModel;
     const after = change.after.data() as TopImageModel;
@@ -100,57 +75,46 @@ export default class TopImageController extends AbstractController {
     }
   }
 
-  /**
-   * IDに紐づくトップ画像を削除する
-   * @param data
-   */
   public async deleteById(data: DeleteByIdRequest): Promise<void> {
     await this.topImageRepository.deleteById(data.id);
   }
 
-  /**
-   * トップ画像の削除時に実行する
-   * @param snapshot
-   */
   public async onDelete(snapshot: functions.firestore.DocumentSnapshot): Promise<void> {
     await this.storageUtil.deleteFiles(`topImages/${snapshot.id}`);
     console.log(`"topImages/${snapshot.id}" deleted.`);
   }
 
-  /**
-   * 画像のアップロード時に実行する
-   * @param object
-   */
   public async onUploadImageFile(object: functions.storage.ObjectMetadata): Promise<void> {
     if (
       !this.storageUtil.isImageFile(object) ||
-      !(await this.storageUtil.needToResizeImageFile(object, IMAGE_MAX_WIDTH, IMAGE_MAX_HEIGHT, "cover"))
+      !(await this.storageUtil.needToResizeImageFile(object, TOP_IMAGE_MAX_WIDTH, TOP_IMAGE_MAX_HEIGHT, "cover"))
     ) {
       return;
     }
     // 画像をリサイズする
-    await this.storageUtil.resizeImageFile(object, IMAGE_MAX_WIDTH, IMAGE_MAX_HEIGHT, "cover");
+    await this.storageUtil.resizeImageFile(object, TOP_IMAGE_MAX_WIDTH, TOP_IMAGE_MAX_HEIGHT, "cover");
     await this.storageUtil.makePublic(object.name!);
   }
 
-  /**
-   * サムネイル画像のアップロード時に実行する
-   * @param object
-   */
   public async onUploadThumbnailImageFile(object: functions.storage.ObjectMetadata): Promise<void> {
     if (
       !this.storageUtil.isImageFile(object) ||
       !(await this.storageUtil.needToResizeImageFile(
         object,
-        THUMBNAIL_IMAGE_MAX_WIDTH,
-        THUMBNAIL_IMAGE_MAX_WIDTH,
+        TOP_IMAGE_THUMBNAIL_MAX_WIDTH,
+        TOP_IMAGE_THUMBNAIL_MAX_WIDTH,
         "cover"
       ))
     ) {
       return;
     }
     // サムネイル画像をリサイズする
-    await this.storageUtil.resizeImageFile(object, THUMBNAIL_IMAGE_MAX_WIDTH, THUMBNAIL_IMAGE_MAX_WIDTH, "cover");
+    await this.storageUtil.resizeImageFile(
+      object,
+      TOP_IMAGE_THUMBNAIL_MAX_WIDTH,
+      TOP_IMAGE_THUMBNAIL_MAX_WIDTH,
+      "cover"
+    );
     await this.storageUtil.makePublic(object.name!);
   }
 }

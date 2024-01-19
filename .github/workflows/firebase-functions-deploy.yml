@@ -1,0 +1,25 @@
+name: "[Auto] Deploy Firebase Functions"
+'on':
+  push:
+    branches:
+      - 'master'
+
+jobs:
+  deploy:
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: 'projects/362277105499/locations/global/workloadIdentityPools/github/providers/atelier-api'
+          service_account: 'firebase-adminsdk-baddz@atelier-4464b.iam.gserviceaccount.com'
+      - run: cd functions
+      - run: npm ci
+      - run: npm i -g firebase-tools
+      - run: npm run build
+      - run: npm run deploy

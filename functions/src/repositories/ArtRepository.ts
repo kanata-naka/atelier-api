@@ -1,6 +1,6 @@
+import AbstractRepository from "./AbstractRepository";
 import ArtModel from "../models/ArtModel";
 import ArtGetListCondition from "../schemas/ArtGetListCondition";
-import AbstractRepository from "./AbstractRepository";
 
 export default class ArtRepository extends AbstractRepository<ArtModel> {
   constructor() {

@@ -1,6 +1,6 @@
+import AbstractRepository from "./AbstractRepository";
 import WorkModel from "../models/WorkModel";
 import WorkGetListCondition from "../schemas/WorkGetListCondition";
-import AbstractRepository from "./AbstractRepository";
 
 export default class WorkRepository extends AbstractRepository<WorkModel> {
   constructor() {

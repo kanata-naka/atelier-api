@@ -1,5 +1,6 @@
 import * as functions from "firebase-functions";
 import { injectable } from "tsyringe";
+import AbstractController from "./AbstractController";
 import { WORK_IMAGE_MAX_WIDTH, WORK_IMAGE_SMALL_MAX_WIDTH, WORK_IMAGE_SMALL_NAME_SUFFIX } from "../constants";
 import WorkModel from "../models/WorkModel";
 import WorkRepository from "../repositories/WorkRepository";
@@ -11,7 +12,6 @@ import WorkGetListResponse from "../schemas/WorkGetListResponse";
 import WorkGetResponse from "../schemas/WorkGetResponse";
 import WorkUpdateRequest from "../schemas/WorkUpdateRequest";
 import StorageUtil from "../utils/StorageUtil";
-import AbstractController from "./AbstractController";
 
 /**
  * 作品のコントローラ

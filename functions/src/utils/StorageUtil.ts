@@ -28,8 +28,8 @@ export default class StorageUtil {
     await this.bucket.file(name).delete();
   }
 
-  public async deleteFiles(directory: string) {
-    await this.bucket.deleteFiles({ directory });
+  public async deleteFiles(prefix: string) {
+    await this.bucket.deleteFiles({ prefix });
   }
 
   public isImageFile(object: functions.storage.ObjectMetadata): boolean {
@@ -51,7 +51,7 @@ export default class StorageUtil {
     object: functions.storage.ObjectMetadata,
     destinationWidth: number,
     destinationHeight: number,
-    fit: "inside" | "cover" = "inside"
+    fit: "inside" | "cover" = "inside",
   ): Promise<boolean> {
     return new Promise((resolve, reject) => {
       const name = object.name!;
@@ -96,7 +96,7 @@ export default class StorageUtil {
     destinationWidth: number,
     destinationHeight: number,
     fit: "inside" | "cover" = "inside",
-    destinationName?: string
+    destinationName?: string,
   ) {
     return new Promise<void>((resolve, reject) => {
       const name = object.name!;

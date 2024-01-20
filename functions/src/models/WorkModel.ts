@@ -1,5 +1,5 @@
-import { Restrict } from "../types";
 import BaseModel from "./BaseModel";
+import { Restrict } from "../types";
 
 export default interface WorkModel extends BaseModel {
   title: string;

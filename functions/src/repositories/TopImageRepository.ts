@@ -1,5 +1,5 @@
-import TopImageModel from "../models/TopImageModel";
 import AbstractRepository from "./AbstractRepository";
+import TopImageModel from "../models/TopImageModel";
 
 export default class TopImageRepository extends AbstractRepository<TopImageModel> {
   constructor() {

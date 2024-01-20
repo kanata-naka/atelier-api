@@ -1,5 +1,6 @@
 import * as functions from "firebase-functions";
 import { injectable } from "tsyringe";
+import AbstractController from "./AbstractController";
 import {
   ART_IMAGE_MEDIUM_MAX_WIDTH,
   ART_IMAGE_MEDIUM_NAME_SUFFIX,
@@ -17,7 +18,6 @@ import ArtUpdateRequest from "../schemas/ArtUpdateRequest";
 import DeleteByIdRequest from "../schemas/DeleteByIdRequest";
 import GetByIdRequest from "../schemas/GetByIdRequest";
 import StorageUtil from "../utils/StorageUtil";
-import AbstractController from "./AbstractController";
 
 @injectable()
 export default class ArtController extends AbstractController {

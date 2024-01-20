@@ -1,6 +1,7 @@
 import * as admin from "firebase-admin";
-import TagInfoModel from "../models/TagInfoModel";
+import { FieldValue } from "firebase-admin/firestore";
 import AbstractRepository from "./AbstractRepository";
+import TagInfoModel from "../models/TagInfoModel";
 
 export default class TagInfoRepository extends AbstractRepository<TagInfoModel> {
   constructor() {
@@ -28,7 +29,7 @@ export default class TagInfoRepository extends AbstractRepository<TagInfoModel> 
     // タグ情報に登録する
     await this.collectionRef.doc(id).set({
       info,
-      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      updatedAt: FieldValue.serverTimestamp(),
     });
   }
 }

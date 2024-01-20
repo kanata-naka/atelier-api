@@ -1,4 +1,5 @@
 import * as admin from "firebase-admin";
+import { Timestamp, UpdateData } from "firebase-admin/firestore";
 import BaseModel from "../models/BaseModel";
 
 export default abstract class AbstractRepository<T extends BaseModel> {
@@ -34,7 +35,7 @@ export default abstract class AbstractRepository<T extends BaseModel> {
     await documentRef.update({
       updatedAt: this.now,
       ...model,
-    });
+    } as UpdateData<T>);
   }
 
   public async bulkUpdate(models: Array<T>): Promise<void> {
@@ -57,9 +58,9 @@ export default abstract class AbstractRepository<T extends BaseModel> {
         batch.update(documentSnapshot.ref, {
           updatedAt: this.now,
           ...model,
-        });
+        } as UpdateData<T>);
         count++;
-      })
+      }),
     );
     await batch.commit();
   }
@@ -85,16 +86,16 @@ export default abstract class AbstractRepository<T extends BaseModel> {
         }
         batch.delete(documentSnapshot.ref);
         count++;
-      })
+      }),
     );
     await batch.commit();
   }
 
-  public get now(): FirebaseFirestore.Timestamp {
-    return admin.firestore.Timestamp.now();
+  public get now(): Timestamp {
+    return Timestamp.now();
   }
 
-  public createTimestamp(seconds: number): FirebaseFirestore.Timestamp {
-    return admin.firestore.Timestamp.fromMillis(seconds * 1000);
+  public createTimestamp(seconds: number): Timestamp {
+    return Timestamp.fromMillis(seconds * 1000);
   }
 }

@@ -1,5 +1,6 @@
 import * as functions from "firebase-functions";
 import { injectable } from "tsyringe";
+import AbstractController from "./AbstractController";
 import { TOP_IMAGE_MAX_HEIGHT, TOP_IMAGE_MAX_WIDTH, TOP_IMAGE_THUMBNAIL_MAX_WIDTH } from "../constants";
 import TopImageModel from "../models/TopImageModel";
 import TopImageRepository from "../repositories/TopImageRepository";
@@ -10,7 +11,6 @@ import TopImageCreateRequest from "../schemas/TopImageCreateRequest";
 import TopImageGetListResponse from "../schemas/TopImageGetListResponse";
 import TopImageGetResponse from "../schemas/TopImageGetResponse";
 import StorageUtil from "../utils/StorageUtil";
-import AbstractController from "./AbstractController";
 
 @injectable()
 export default class TopImageController extends AbstractController {

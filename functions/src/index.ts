@@ -1,7 +1,7 @@
 import "reflect-metadata";
 import * as admin from "firebase-admin";
 import * as functions from "firebase-functions";
-import { HttpsError } from "firebase-functions/lib/providers/https";
+import { CallableContext, HttpsError } from "firebase-functions/v1/https";
 import { container } from "tsyringe";
 import { FIREBASE_REGION } from "./constants";
 import ArtController from "./controllers/ArtController";
@@ -11,7 +11,7 @@ import WorkController from "./controllers/WorkController";
 
 admin.initializeApp();
 
-const hasAdminUserClaim = async (context: functions.https.CallableContext) => {
+const hasAdminUserClaim = async (context: CallableContext) => {
   if (!context.auth) {
     return false;
   }

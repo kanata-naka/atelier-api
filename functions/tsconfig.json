@@ -1,17 +1,20 @@
 {
   "compilerOptions": {
+    "target": "es6",
+    "strict": true,
     "module": "commonjs",
     "noImplicitReturns": true,
     "noUnusedLocals": true,
     "outDir": "dist",
     "sourceMap": true,
-    "strict": true,
-    "target": "es6",
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true
   },
   "compileOnSave": true,
   "include": [
     "src"
+  ],
+  "exclude": [
+    "dist", "node_modules"
   ]
 }

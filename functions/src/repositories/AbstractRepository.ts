@@ -50,7 +50,7 @@ export default abstract class AbstractRepository<T extends BaseModel> {
         }
         delete model.id;
         if (count === 500) {
-          // 500件ごとにcommitしてbatchインスタンスを初期化する
+          // 500件ごとにコミットしてインスタンスを初期化する
           await batch.commit();
           batch = admin.firestore().batch();
           count = 0;
@@ -79,7 +79,7 @@ export default abstract class AbstractRepository<T extends BaseModel> {
           return;
         }
         if (count === 500) {
-          // 500件ごとにcommitしてbatchインスタンスを初期化する
+          // 500件ごとにコミットしてインスタンスを初期化する
           await batch.commit();
           batch = admin.firestore().batch();
           count = 0;

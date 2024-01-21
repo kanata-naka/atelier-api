@@ -2,10 +2,10 @@ import * as functions from "firebase-functions";
 import { injectable } from "tsyringe";
 import AbstractController from "./AbstractController";
 import {
+  IMAGE_SMALL_NAME_SUFFIX,
+  IMAGE_MEDIUM_NAME_SUFFIX,
   ART_IMAGE_MEDIUM_MAX_WIDTH,
-  ART_IMAGE_MEDIUM_NAME_SUFFIX,
   ART_IMAGE_SMALL_MAX_WIDTH,
-  ART_IMAGE_SMALL_NAME_SUFFIX,
 } from "../constants";
 import ArtModel from "../models/ArtModel";
 import ArtRepository from "../repositories/ArtRepository";
@@ -24,7 +24,7 @@ export default class ArtController extends AbstractController {
   constructor(
     private artRepository: ArtRepository,
     private tagInfoRepository: TagInfoRepository,
-    private storageUtil: StorageUtil
+    private storageUtil: StorageUtil,
   ) {
     super();
   }
@@ -54,11 +54,11 @@ export default class ArtController extends AbstractController {
             name: image.name,
             url: this.storageUtil.getPublicUrl(image.name),
             thumbnailUrl: {
-              small: await this.getThumbnailUrl(image.name, ART_IMAGE_SMALL_NAME_SUFFIX),
-              medium: await this.getThumbnailUrl(image.name, ART_IMAGE_MEDIUM_NAME_SUFFIX),
+              small: await this.getThumbnailUrl(image.name, IMAGE_SMALL_NAME_SUFFIX),
+              medium: await this.getThumbnailUrl(image.name, IMAGE_MEDIUM_NAME_SUFFIX),
             },
           };
-        })
+        }),
       ),
       restrict: model.restrict,
       description: model.description,
@@ -103,14 +103,14 @@ export default class ArtController extends AbstractController {
       await Promise.all(
         [
           beforeImage.name,
-          this.storageUtil.addSuffix(beforeImage.name, ART_IMAGE_SMALL_NAME_SUFFIX),
-          this.storageUtil.addSuffix(beforeImage.name, ART_IMAGE_MEDIUM_NAME_SUFFIX),
+          this.storageUtil.addSuffix(beforeImage.name, IMAGE_SMALL_NAME_SUFFIX),
+          this.storageUtil.addSuffix(beforeImage.name, IMAGE_MEDIUM_NAME_SUFFIX),
         ].map((name) =>
           this.storageUtil
             .deleteFile(name)
             .then(() => console.log(`"${name}" deleted.`))
-            .catch(() => console.error(`"${name}" failed to delete.`))
-        )
+            .catch(() => console.error(`"${name}" failed to delete.`)),
+        ),
       );
     }
   }
@@ -129,7 +129,7 @@ export default class ArtController extends AbstractController {
   public async onUploadImageFile(object: functions.storage.ObjectMetadata): Promise<void> {
     const name = object.name!;
 
-    if (name.includes(ART_IMAGE_SMALL_NAME_SUFFIX) || name.includes(ART_IMAGE_MEDIUM_NAME_SUFFIX)) {
+    if (name.includes(IMAGE_SMALL_NAME_SUFFIX) || name.includes(IMAGE_MEDIUM_NAME_SUFFIX)) {
       return;
     }
     if (!this.storageUtil.isImageFile(object)) {
@@ -138,24 +138,24 @@ export default class ArtController extends AbstractController {
     await this.storageUtil.makePublic(name);
 
     // サムネイル画像（小）を生成する
-    const smallImageName = this.storageUtil.addSuffix(name, ART_IMAGE_SMALL_NAME_SUFFIX);
+    const smallImageName = this.storageUtil.addSuffix(name, IMAGE_SMALL_NAME_SUFFIX);
     await this.storageUtil.resizeImageFile(
       object,
       ART_IMAGE_SMALL_MAX_WIDTH,
       ART_IMAGE_SMALL_MAX_WIDTH,
       "inside",
-      smallImageName
+      smallImageName,
     );
     await this.storageUtil.makePublic(smallImageName);
 
     // サムネイル画像（中）を生成する
-    const mediumImageName = this.storageUtil.addSuffix(name, ART_IMAGE_MEDIUM_NAME_SUFFIX);
+    const mediumImageName = this.storageUtil.addSuffix(name, IMAGE_MEDIUM_NAME_SUFFIX);
     await this.storageUtil.resizeImageFile(
       object,
       ART_IMAGE_MEDIUM_MAX_WIDTH,
       ART_IMAGE_MEDIUM_MAX_WIDTH,
       "inside",
-      mediumImageName
+      mediumImageName,
     );
     await this.storageUtil.makePublic(mediumImageName);
   }

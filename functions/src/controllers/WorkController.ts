@@ -1,7 +1,7 @@
 import * as functions from "firebase-functions";
 import { injectable } from "tsyringe";
 import AbstractController from "./AbstractController";
-import { WORK_IMAGE_MAX_WIDTH, WORK_IMAGE_SMALL_MAX_WIDTH, WORK_IMAGE_SMALL_NAME_SUFFIX } from "../constants";
+import { IMAGE_SMALL_NAME_SUFFIX, WORK_IMAGE_MAX_WIDTH, WORK_IMAGE_SMALL_MAX_WIDTH } from "../constants";
 import WorkModel from "../models/WorkModel";
 import WorkRepository from "../repositories/WorkRepository";
 import DeleteByIdRequest from "../schemas/DeleteByIdRequest";
@@ -18,7 +18,10 @@ import StorageUtil from "../utils/StorageUtil";
  */
 @injectable()
 export default class WorkController extends AbstractController {
-  constructor(private workRepository: WorkRepository, private storageUtil: StorageUtil) {
+  constructor(
+    private workRepository: WorkRepository,
+    private storageUtil: StorageUtil,
+  ) {
     super();
   }
 
@@ -45,10 +48,10 @@ export default class WorkController extends AbstractController {
             name: image.name,
             url: this.storageUtil.getPublicUrl(image.name),
             thumbnailUrl: {
-              small: await this.getThumbnailUrl(image.name, WORK_IMAGE_SMALL_NAME_SUFFIX),
+              small: await this.getThumbnailUrl(image.name, IMAGE_SMALL_NAME_SUFFIX),
             },
           };
-        })
+        }),
       ),
       description: model.description,
       restrict: model.restrict,
@@ -87,12 +90,12 @@ export default class WorkController extends AbstractController {
         continue;
       }
       await Promise.all(
-        [beforeImage.name, this.storageUtil.addSuffix(beforeImage.name, WORK_IMAGE_SMALL_NAME_SUFFIX)].map((name) =>
+        [beforeImage.name, this.storageUtil.addSuffix(beforeImage.name, IMAGE_SMALL_NAME_SUFFIX)].map((name) =>
           this.storageUtil
             .deleteFile(name)
             .then(() => console.log(`"${name}" deleted.`))
-            .catch(() => console.error(`"${name}" failed to delete.`))
-        )
+            .catch(() => console.error(`"${name}" failed to delete.`)),
+        ),
       );
     }
   }
@@ -109,19 +112,19 @@ export default class WorkController extends AbstractController {
   public async onUploadImageFile(object: functions.storage.ObjectMetadata): Promise<void> {
     const name = object.name!;
 
-    if (name.includes(WORK_IMAGE_SMALL_NAME_SUFFIX) || !this.storageUtil.isImageFile(object)) {
+    if (name.includes(IMAGE_SMALL_NAME_SUFFIX) || !this.storageUtil.isImageFile(object)) {
       return;
     }
 
     // サムネイル画像（小）を生成する
-    const smallImageName = this.storageUtil.addSuffix(name, WORK_IMAGE_SMALL_NAME_SUFFIX);
+    const smallImageName = this.storageUtil.addSuffix(name, IMAGE_SMALL_NAME_SUFFIX);
     if (!(await this.storageUtil.exists(smallImageName))) {
       await this.storageUtil.resizeImageFile(
         object,
         WORK_IMAGE_SMALL_MAX_WIDTH,
         WORK_IMAGE_SMALL_MAX_WIDTH,
         "inside",
-        smallImageName
+        smallImageName,
       );
       await this.storageUtil.makePublic(smallImageName);
     }

@@ -7,7 +7,7 @@ import ArtController from "./controllers/ArtController";
 import TagInfoController from "./controllers/TagInfoController";
 import TopImageController from "./controllers/TopImageController";
 import WorkController from "./controllers/WorkController";
-import { withAuthentication } from "./utils/authUtil";
+import { withAuthentication } from "./helpers";
 
 admin.initializeApp();
 

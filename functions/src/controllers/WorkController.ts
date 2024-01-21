@@ -11,7 +11,7 @@ import WorkGetRequest from "../schemas/WorkGetListRequest";
 import WorkGetListResponse from "../schemas/WorkGetListResponse";
 import WorkGetResponse from "../schemas/WorkGetResponse";
 import WorkUpdateRequest from "../schemas/WorkUpdateRequest";
-import StorageUtil from "../utils/StorageUtil";
+import StorageService from "../services/StorageService";
 
 /**
  * 作品のコントローラ
@@ -20,7 +20,7 @@ import StorageUtil from "../utils/StorageUtil";
 export default class WorkController extends AbstractController {
   constructor(
     private workRepository: WorkRepository,
-    private storageUtil: StorageUtil,
+    private storageService: StorageService,
   ) {
     super();
   }
@@ -46,7 +46,7 @@ export default class WorkController extends AbstractController {
         model.images.map(async (image) => {
           return {
             name: image.name,
-            url: this.storageUtil.getPublicUrl(image.name),
+            url: this.storageService.getPublicUrl(image.name),
             thumbnailUrl: {
               small: await this.getThumbnailUrl(image.name, IMAGE_SMALL_NAME_SUFFIX),
             },
@@ -61,7 +61,7 @@ export default class WorkController extends AbstractController {
   }
 
   private async getThumbnailUrl(name: string, suffix: string) {
-    return this.storageUtil.getPublicUrl(this.storageUtil.addSuffix(name, suffix));
+    return this.storageService.getPublicUrl(this.storageService.addSuffix(name, suffix));
   }
 
   public async create(data: WorkCreateRequest): Promise<void> {
@@ -90,8 +90,8 @@ export default class WorkController extends AbstractController {
         continue;
       }
       await Promise.all(
-        [beforeImage.name, this.storageUtil.addSuffix(beforeImage.name, IMAGE_SMALL_NAME_SUFFIX)].map((name) =>
-          this.storageUtil
+        [beforeImage.name, this.storageService.addSuffix(beforeImage.name, IMAGE_SMALL_NAME_SUFFIX)].map((name) =>
+          this.storageService
             .deleteFile(name)
             .then(() => console.log(`"${name}" deleted.`))
             .catch(() => console.error(`"${name}" failed to delete.`)),
@@ -105,34 +105,34 @@ export default class WorkController extends AbstractController {
   }
 
   public async onDelete(snapshot: functions.firestore.DocumentSnapshot): Promise<void> {
-    await this.storageUtil.deleteFiles(`works/${snapshot.id}`);
+    await this.storageService.deleteFiles(`works/${snapshot.id}`);
     console.log(`"works/${snapshot.id}" deleted.`);
   }
 
   public async onUploadImageFile(object: functions.storage.ObjectMetadata): Promise<void> {
     const name = object.name!;
 
-    if (name.includes(IMAGE_SMALL_NAME_SUFFIX) || !this.storageUtil.isImageFile(object)) {
+    if (name.includes(IMAGE_SMALL_NAME_SUFFIX) || !this.storageService.isImageFile(object)) {
       return;
     }
 
     // サムネイル画像（小）を生成する
-    const smallImageName = this.storageUtil.addSuffix(name, IMAGE_SMALL_NAME_SUFFIX);
-    if (!(await this.storageUtil.exists(smallImageName))) {
-      await this.storageUtil.resizeImageFile(
+    const smallImageName = this.storageService.addSuffix(name, IMAGE_SMALL_NAME_SUFFIX);
+    if (!(await this.storageService.exists(smallImageName))) {
+      await this.storageService.resizeImageFile(
         object,
         WORK_IMAGE_SMALL_MAX_WIDTH,
         WORK_IMAGE_SMALL_MAX_WIDTH,
         "inside",
         smallImageName,
       );
-      await this.storageUtil.makePublic(smallImageName);
+      await this.storageService.makePublic(smallImageName);
     }
 
     // 画像をリサイズする
-    if (await this.storageUtil.needToResizeImageFile(object, WORK_IMAGE_MAX_WIDTH, WORK_IMAGE_MAX_WIDTH, "inside")) {
-      await this.storageUtil.resizeImageFile(object, WORK_IMAGE_MAX_WIDTH, WORK_IMAGE_MAX_WIDTH, "inside");
-      await this.storageUtil.makePublic(name);
+    if (await this.storageService.needToResizeImageFile(object, WORK_IMAGE_MAX_WIDTH, WORK_IMAGE_MAX_WIDTH, "inside")) {
+      await this.storageService.resizeImageFile(object, WORK_IMAGE_MAX_WIDTH, WORK_IMAGE_MAX_WIDTH, "inside");
+      await this.storageService.makePublic(name);
     }
   }
 }

@@ -17,14 +17,14 @@ import ArtGetResponse from "../schemas/ArtGetResponse";
 import ArtUpdateRequest from "../schemas/ArtUpdateRequest";
 import DeleteByIdRequest from "../schemas/DeleteByIdRequest";
 import GetByIdRequest from "../schemas/GetByIdRequest";
-import StorageUtil from "../utils/StorageUtil";
+import StorageService from "../services/StorageService";
 
 @injectable()
 export default class ArtController extends AbstractController {
   constructor(
     private artRepository: ArtRepository,
     private tagInfoRepository: TagInfoRepository,
-    private storageUtil: StorageUtil,
+    private storageService: StorageService,
   ) {
     super();
   }
@@ -52,7 +52,7 @@ export default class ArtController extends AbstractController {
         model.images.map(async (image) => {
           return {
             name: image.name,
-            url: this.storageUtil.getPublicUrl(image.name),
+            url: this.storageService.getPublicUrl(image.name),
             thumbnailUrl: {
               small: await this.getThumbnailUrl(image.name, IMAGE_SMALL_NAME_SUFFIX),
               medium: await this.getThumbnailUrl(image.name, IMAGE_MEDIUM_NAME_SUFFIX),
@@ -68,7 +68,7 @@ export default class ArtController extends AbstractController {
   }
 
   private async getThumbnailUrl(name: string, suffix: string): Promise<string> {
-    return this.storageUtil.getPublicUrl(this.storageUtil.addSuffix(name, suffix));
+    return this.storageService.getPublicUrl(this.storageService.addSuffix(name, suffix));
   }
 
   public async create(data: ArtCreateRequest): Promise<void> {
@@ -103,10 +103,10 @@ export default class ArtController extends AbstractController {
       await Promise.all(
         [
           beforeImage.name,
-          this.storageUtil.addSuffix(beforeImage.name, IMAGE_SMALL_NAME_SUFFIX),
-          this.storageUtil.addSuffix(beforeImage.name, IMAGE_MEDIUM_NAME_SUFFIX),
+          this.storageService.addSuffix(beforeImage.name, IMAGE_SMALL_NAME_SUFFIX),
+          this.storageService.addSuffix(beforeImage.name, IMAGE_MEDIUM_NAME_SUFFIX),
         ].map((name) =>
-          this.storageUtil
+          this.storageService
             .deleteFile(name)
             .then(() => console.log(`"${name}" deleted.`))
             .catch(() => console.error(`"${name}" failed to delete.`)),
@@ -122,7 +122,7 @@ export default class ArtController extends AbstractController {
   }
 
   public async onDelete(snapshot: functions.firestore.DocumentSnapshot): Promise<void> {
-    await this.storageUtil.deleteFiles(`arts/${snapshot.id}`);
+    await this.storageService.deleteFiles(`arts/${snapshot.id}`);
     console.log(`"arts/${snapshot.id}" deleted.`);
   }
 
@@ -132,31 +132,31 @@ export default class ArtController extends AbstractController {
     if (name.includes(IMAGE_SMALL_NAME_SUFFIX) || name.includes(IMAGE_MEDIUM_NAME_SUFFIX)) {
       return;
     }
-    if (!this.storageUtil.isImageFile(object)) {
+    if (!this.storageService.isImageFile(object)) {
       return;
     }
-    await this.storageUtil.makePublic(name);
+    await this.storageService.makePublic(name);
 
     // サムネイル画像（小）を生成する
-    const smallImageName = this.storageUtil.addSuffix(name, IMAGE_SMALL_NAME_SUFFIX);
-    await this.storageUtil.resizeImageFile(
+    const smallImageName = this.storageService.addSuffix(name, IMAGE_SMALL_NAME_SUFFIX);
+    await this.storageService.resizeImageFile(
       object,
       ART_IMAGE_SMALL_MAX_WIDTH,
       ART_IMAGE_SMALL_MAX_WIDTH,
       "inside",
       smallImageName,
     );
-    await this.storageUtil.makePublic(smallImageName);
+    await this.storageService.makePublic(smallImageName);
 
     // サムネイル画像（中）を生成する
-    const mediumImageName = this.storageUtil.addSuffix(name, IMAGE_MEDIUM_NAME_SUFFIX);
-    await this.storageUtil.resizeImageFile(
+    const mediumImageName = this.storageService.addSuffix(name, IMAGE_MEDIUM_NAME_SUFFIX);
+    await this.storageService.resizeImageFile(
       object,
       ART_IMAGE_MEDIUM_MAX_WIDTH,
       ART_IMAGE_MEDIUM_MAX_WIDTH,
       "inside",
       mediumImageName,
     );
-    await this.storageUtil.makePublic(mediumImageName);
+    await this.storageService.makePublic(mediumImageName);
   }
 }

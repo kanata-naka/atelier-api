@@ -10,11 +10,14 @@ import TopImageBulkUpdateRequest from "../schemas/TopImageBulkUpdateRequest";
 import TopImageCreateRequest from "../schemas/TopImageCreateRequest";
 import TopImageGetListResponse from "../schemas/TopImageGetListResponse";
 import TopImageGetResponse from "../schemas/TopImageGetResponse";
-import StorageUtil from "../utils/StorageUtil";
+import StorageService from "../services/StorageService";
 
 @injectable()
 export default class TopImageController extends AbstractController {
-  constructor(private topImageRepository: TopImageRepository, private storageUtil: StorageUtil) {
+  constructor(
+    private topImageRepository: TopImageRepository,
+    private storageService: StorageService,
+  ) {
     super();
   }
 
@@ -35,11 +38,11 @@ export default class TopImageController extends AbstractController {
       id: model.id!,
       image: {
         name: model.image.name,
-        url: this.storageUtil.getPublicUrl(model.image.name),
+        url: this.storageService.getPublicUrl(model.image.name),
       },
       thumbnailImage: {
         name: model.thumbnailImage.name,
-        url: this.storageUtil.getPublicUrl(model.thumbnailImage.name),
+        url: this.storageService.getPublicUrl(model.thumbnailImage.name),
       },
       description: model.description,
       order: model.order,
@@ -62,13 +65,13 @@ export default class TopImageController extends AbstractController {
 
     // 古い画像を削除する
     if (before.image.name !== after.image.name) {
-      await this.storageUtil
+      await this.storageService
         .deleteFile(before.image.name)
         .then(() => console.log(`"${before.image.name}" deleted.`))
         .catch(() => console.error(`"${before.image.name}" failed to delete.`));
     }
     if (before.thumbnailImage.name !== after.thumbnailImage.name) {
-      await this.storageUtil
+      await this.storageService
         .deleteFile(before.thumbnailImage.name)
         .then(() => console.log(`"${before.thumbnailImage.name}" deleted.`))
         .catch(() => console.error(`"${before.thumbnailImage.name}" failed to delete.`));
@@ -80,41 +83,41 @@ export default class TopImageController extends AbstractController {
   }
 
   public async onDelete(snapshot: functions.firestore.DocumentSnapshot): Promise<void> {
-    await this.storageUtil.deleteFiles(`topImages/${snapshot.id}`);
+    await this.storageService.deleteFiles(`topImages/${snapshot.id}`);
     console.log(`"topImages/${snapshot.id}" deleted.`);
   }
 
   public async onUploadImageFile(object: functions.storage.ObjectMetadata): Promise<void> {
     if (
-      !this.storageUtil.isImageFile(object) ||
-      !(await this.storageUtil.needToResizeImageFile(object, TOP_IMAGE_MAX_WIDTH, TOP_IMAGE_MAX_HEIGHT, "cover"))
+      !this.storageService.isImageFile(object) ||
+      !(await this.storageService.needToResizeImageFile(object, TOP_IMAGE_MAX_WIDTH, TOP_IMAGE_MAX_HEIGHT, "cover"))
     ) {
       return;
     }
     // 画像をリサイズする
-    await this.storageUtil.resizeImageFile(object, TOP_IMAGE_MAX_WIDTH, TOP_IMAGE_MAX_HEIGHT, "cover");
-    await this.storageUtil.makePublic(object.name!);
+    await this.storageService.resizeImageFile(object, TOP_IMAGE_MAX_WIDTH, TOP_IMAGE_MAX_HEIGHT, "cover");
+    await this.storageService.makePublic(object.name!);
   }
 
   public async onUploadThumbnailImageFile(object: functions.storage.ObjectMetadata): Promise<void> {
     if (
-      !this.storageUtil.isImageFile(object) ||
-      !(await this.storageUtil.needToResizeImageFile(
+      !this.storageService.isImageFile(object) ||
+      !(await this.storageService.needToResizeImageFile(
         object,
         TOP_IMAGE_THUMBNAIL_MAX_WIDTH,
         TOP_IMAGE_THUMBNAIL_MAX_WIDTH,
-        "cover"
+        "cover",
       ))
     ) {
       return;
     }
     // サムネイル画像をリサイズする
-    await this.storageUtil.resizeImageFile(
+    await this.storageService.resizeImageFile(
       object,
       TOP_IMAGE_THUMBNAIL_MAX_WIDTH,
       TOP_IMAGE_THUMBNAIL_MAX_WIDTH,
-      "cover"
+      "cover",
     );
-    await this.storageUtil.makePublic(object.name!);
+    await this.storageService.makePublic(object.name!);
   }
 }

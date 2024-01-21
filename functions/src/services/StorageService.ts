@@ -3,9 +3,7 @@ import * as admin from "firebase-admin";
 import * as functions from "firebase-functions";
 import * as sharp from "sharp";
 
-export default class StorageUtil {
-  private static readonly PUBLIC_URL_BASE: string = "https://storage.googleapis.com";
-
+export default class StorageService {
   protected bucket: Bucket;
 
   constructor() {
@@ -17,7 +15,7 @@ export default class StorageUtil {
   }
 
   public getPublicUrl(name: string) {
-    return `${StorageUtil.PUBLIC_URL_BASE}/${this.bucket.name}/${name}`;
+    return `https://storage.googleapis.com/${this.bucket.name}/${name}`;
   }
 
   public async makePublic(name: string) {

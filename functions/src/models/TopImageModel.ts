@@ -1,12 +1,17 @@
 import BaseModel from "./BaseModel";
+import { Nullable } from "../types";
 
-export default interface TopImageModel extends BaseModel {
-  image: {
-    name: string;
-  };
-  thumbnailImage: {
-    name: string;
-  };
-  description?: string;
+export interface TopImageModel extends BaseModel {
+  image: TopImageModel.Image;
+  thumbnailImage: TopImageModel.Image;
+  description: Nullable<string>;
   order: number;
 }
+
+export namespace TopImageModel {
+  export interface Image {
+    name: string;
+  }
+}
+
+export default TopImageModel;

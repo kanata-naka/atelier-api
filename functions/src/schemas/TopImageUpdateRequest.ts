@@ -1,5 +1,3 @@
 import TopImageCreateRequest from "./TopImageCreateRequest";
 
-export default interface TopImageUpdateRequest extends TopImageCreateRequest {
-  id: string;
-}
+export default interface TopImageUpdateRequest extends TopImageCreateRequest {}

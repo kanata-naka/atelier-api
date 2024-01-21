@@ -1,11 +1,18 @@
-import { Restrict } from "../types";
+import { Nullable, Restrict } from "../types";
 
-export default interface WorkCreateRequest {
+export interface WorkCreateRequest {
+  id: string;
   title: string;
   publishedDate: number;
-  images: {
-    name: string;
-  }[];
-  description?: string;
+  images: WorkCreateRequest.Image[];
+  description: Nullable<string>;
   restrict: Restrict;
 }
+
+export namespace WorkCreateRequest {
+  export interface Image {
+    name: string;
+  }
+}
+
+export default WorkCreateRequest;

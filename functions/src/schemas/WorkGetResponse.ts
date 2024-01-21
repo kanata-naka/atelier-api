@@ -1,18 +1,24 @@
-import { Restrict } from "../types";
+import { Nullable, Restrict } from "../types";
 
-export default interface WorkGetResponse {
+export interface WorkGetResponse {
   id: string;
   title: string;
   publishedDate: number;
-  images?: {
+  images: WorkGetResponse.Image[];
+  description: Nullable<string>;
+  restrict: Restrict;
+  createdAt: number;
+  updatedAt: number;
+}
+
+export namespace WorkGetResponse {
+  export interface Image {
     name: string;
     url: string;
     thumbnailUrl: {
       small: string;
     };
-  }[];
-  description?: string;
-  restrict: Restrict;
-  createdAt: number;
-  updatedAt: number;
+  }
 }
+
+export default WorkGetResponse;

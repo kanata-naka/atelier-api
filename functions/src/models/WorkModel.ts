@@ -1,12 +1,18 @@
 import BaseModel from "./BaseModel";
-import { Restrict } from "../types";
+import { Nullable, Restrict } from "../types";
 
-export default interface WorkModel extends BaseModel {
+export interface WorkModel extends BaseModel {
   title: string;
   publishedDate: FirebaseFirestore.Timestamp;
-  images: {
-    name: string;
-  }[];
-  description?: string;
+  images: WorkModel.Image[];
+  description: Nullable<string>;
   restrict: Restrict;
 }
+
+export namespace WorkModel {
+  export interface Image {
+    name: string;
+  }
+}
+
+export default WorkModel;

@@ -11,10 +11,7 @@ export default class TagInfoRepository extends AbstractRepository<TagInfoModel> 
   public async aggregateById(id: string) {
     // 全件取得してタグを集計する
     const snapshot = await admin.firestore().collection(id).orderBy("createdAt", "desc").select("tags").get();
-    const info: Array<{
-      name: string;
-      count: number;
-    }> = [];
+    const info: TagInfoModel.TagInfo[] = [];
     snapshot.docs.map((documentSnapshot) => {
       const tagNames: string[] = [...documentSnapshot.data().tags];
       tagNames.forEach((tagName) => {

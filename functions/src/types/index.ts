@@ -1,3 +1,5 @@
 import { Restrict } from "../constants";
 
-export type Restrict = typeof Restrict[keyof typeof Restrict];
+export type Nullable<T> = T | null;
+
+export type Restrict = (typeof Restrict)[keyof typeof Restrict];

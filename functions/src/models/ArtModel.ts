@@ -1,12 +1,18 @@
 import BaseModel from "./BaseModel";
-import { Restrict } from "../types";
+import { Nullable, Restrict } from "../types";
 
-export default interface ArtModel extends BaseModel {
+export interface ArtModel extends BaseModel {
   title: string;
-  tags?: string[];
-  images: {
-    name: string;
-  }[];
-  description?: string;
+  tags: string[];
+  images: ArtModel.Image[];
+  description: Nullable<string>;
   restrict: Restrict;
 }
+
+export namespace ArtModel {
+  export interface Image {
+    name: string;
+  }
+}
+
+export default ArtModel;

@@ -13,9 +13,6 @@ import WorkGetResponse from "../schemas/WorkGetResponse";
 import WorkUpdateRequest from "../schemas/WorkUpdateRequest";
 import StorageService from "../services/StorageService";
 
-/**
- * 作品のコントローラ
- */
 @injectable()
 export default class WorkController extends AbstractController {
   constructor(

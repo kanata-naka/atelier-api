@@ -1,19 +1,25 @@
-import { Restrict } from "../types";
+import { Nullable, Restrict } from "../types";
 
-export default interface ArtGetResponse {
+export interface ArtGetResponse {
   id: string;
   title: string;
-  tags?: string[];
-  images: {
+  tags: string[];
+  images: ArtGetResponse.Image[];
+  description: Nullable<string>;
+  restrict: Restrict;
+  createdAt: number;
+  updatedAt: number;
+}
+
+export namespace ArtGetResponse {
+  export interface Image {
     name: string;
     url: string;
     thumbnailUrl: {
       small: string;
       medium: string;
     };
-  }[];
-  description?: string;
-  restrict: Restrict;
-  createdAt: number;
-  updatedAt: number;
+  }
 }
+
+export default ArtGetResponse;

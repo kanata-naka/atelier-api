@@ -1,8 +1,14 @@
 import BaseModel from "./BaseModel";
 
-export default interface TagInfoModel extends BaseModel {
-  info: {
+export interface TagInfoModel extends BaseModel {
+  info: TagInfoModel.TagInfo[];
+}
+
+export namespace TagInfoModel {
+  export interface TagInfo {
     name: string;
     count: number;
-  }[];
+  }
 }
+
+export default TagInfoModel;

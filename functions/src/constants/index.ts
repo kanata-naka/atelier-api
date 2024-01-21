@@ -1,5 +1,7 @@
 export const FIREBASE_REGION = "asia-northeast1";
 
+export const UPLOAD_FILE_FUNCTION_MEMORY_AMOUNT = "512MB";
+
 export const Restrict = {
   ALL: "0",
   LIMITED: "1",

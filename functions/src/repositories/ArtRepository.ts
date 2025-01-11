@@ -4,7 +4,7 @@ import ArtGetListCondition from "../schemas/ArtGetListCondition";
 
 export default class ArtRepository extends AbstractRepository<ArtModel> {
   constructor() {
-    super("arts");
+    super(["arts"]);
   }
 
   public async get(condition: ArtGetListCondition): Promise<Array<ArtModel>> {

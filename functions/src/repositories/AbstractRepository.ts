@@ -5,8 +5,13 @@ import BaseModel from "../models/BaseModel";
 export default abstract class AbstractRepository<T extends BaseModel> {
   protected collectionRef: FirebaseFirestore.CollectionReference;
 
-  constructor(collectionPath: string) {
-    this.collectionRef = admin.firestore().collection(collectionPath);
+  constructor(collectionPath: string[]) {
+    this.collectionRef = admin.firestore().collection(collectionPath[0]);
+    if (collectionPath.length > 1) {
+      for (let i = 1; i < collectionPath.length; i += 2) {
+        this.collectionRef = this.collectionRef.doc(collectionPath[i]).collection(collectionPath[i + 1]);
+      }
+    }
   }
 
   public async getById(id: string): Promise<T> {

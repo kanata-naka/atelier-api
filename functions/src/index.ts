@@ -4,6 +4,7 @@ import * as functions from "firebase-functions";
 import { container } from "tsyringe";
 import { FIREBASE_REGION, UPLOAD_FILE_FUNCTION_MEMORY_AMOUNT } from "./constants";
 import ArtController from "./controllers/ArtController";
+import ComicController from "./controllers/ComicController";
 import TagInfoController from "./controllers/TagInfoController";
 import TopImageController from "./controllers/TopImageController";
 import WorkController from "./controllers/WorkController";
@@ -107,6 +108,81 @@ export const works = {
     }),
 };
 
+export const comics = {
+  get: functions.region(FIREBASE_REGION).https.onCall(async (data) => {
+    return await container.resolve(ComicController).get(data);
+  }),
+  getById: functions.region(FIREBASE_REGION).https.onCall(async (data) => {
+    return await container.resolve(ComicController).getById(data);
+  }),
+  getByEpisodeId: functions.region(FIREBASE_REGION).https.onCall(async (data) => {
+    return await container.resolve(ComicController).getByEpisodeId(data);
+  }),
+  create: functions.region(FIREBASE_REGION).https.onCall(async (data, context) => {
+    await withAuthentication(context, () => container.resolve(ComicController).create(data));
+  }),
+  createEpisode: functions.region(FIREBASE_REGION).https.onCall(async (data, context) => {
+    await withAuthentication(context, () => container.resolve(ComicController).createEpisode(data));
+  }),
+  createPage: functions.region(FIREBASE_REGION).https.onCall(async (data, context) => {
+    await withAuthentication(context, () => container.resolve(ComicController).createPage(data));
+  }),
+  update: functions.region(FIREBASE_REGION).https.onCall(async (data, context) => {
+    await withAuthentication(context, () => container.resolve(ComicController).update(data));
+  }),
+  updateEpisode: functions.region(FIREBASE_REGION).https.onCall(async (data, context) => {
+    await withAuthentication(context, () => container.resolve(ComicController).updateEpisode(data));
+  }),
+  updatePage: functions.region(FIREBASE_REGION).https.onCall(async (data, context) => {
+    await withAuthentication(context, () => container.resolve(ComicController).updatePage(data));
+  }),
+  onUpdate: functions
+    .region(FIREBASE_REGION)
+    .firestore.document("comics/{id}")
+    .onUpdate(async (change) => {
+      await container.resolve(ComicController).onUpdate(change);
+    }),
+  onUpdateEpisode: functions
+    .region(FIREBASE_REGION)
+    .firestore.document("comics/{id}/episodes/{episodeId}")
+    .onUpdate(async (change) => {
+      await container.resolve(ComicController).onUpdate(change);
+    }),
+  onUpdatePage: functions
+    .region(FIREBASE_REGION)
+    .firestore.document("comics/{id}/episodes/{episodeId}/pages/{pageId}")
+    .onUpdate(async (change) => {
+      await container.resolve(ComicController).onUpdate(change);
+    }),
+  deleteById: functions.region(FIREBASE_REGION).https.onCall(async (data, context) => {
+    await withAuthentication(context, () => container.resolve(ComicController).deleteById(data));
+  }),
+  deleteEpisode: functions.region(FIREBASE_REGION).https.onCall(async (data, context) => {
+    await withAuthentication(context, () => container.resolve(ComicController).deleteEpisode(data));
+  }),
+  deletePage: functions.region(FIREBASE_REGION).https.onCall(async (data, context) => {
+    await withAuthentication(context, () => container.resolve(ComicController).deletePage(data));
+  }),
+  onDelete: functions
+    .region(FIREBASE_REGION)
+    .firestore.document("comics/{id}")
+    .onDelete(async (snapshot) => {
+      await container.resolve(ComicController).onDelete(snapshot);
+    }),
+  onDeleteEpisode: functions
+    .region(FIREBASE_REGION)
+    .firestore.document("comics/{id}/episodes/{episodeId}")
+    .onDelete(async (snapshot) => {
+      await container.resolve(ComicController).onDelete(snapshot);
+    }),
+  onDeletePage: functions
+    .region(FIREBASE_REGION)
+    .firestore.document("comics/{id}/episodes/{episodeId}/pages/{pageId}")
+    .onDelete(async (snapshot) => {
+      await container.resolve(ComicController).onDelete(snapshot);
+    }),
+};
+
 export const adminUsers = {
   onCreate: functions
     .region(FIREBASE_REGION)
@@ -142,6 +218,12 @@ export const storage = {
         await container.resolve(ArtController).onUploadImageFile(object);
       } else if (object.name?.match(/works\/(.+?)\/images\/(.+)/g)) {
         await container.resolve(WorkController).onUploadImageFile(object);
+      } else if (object.name?.match(/comics\/(.+?)\/image\/(.+)/g)) {
+        await container.resolve(ComicController).onUploadImageFile(object);
+      } else if (object.name?.match(/comics\/(.+?)\/episodes\/(.+?)\/image\/(.+)/g)) {
+        await container.resolve(ComicController).onUploadEpisodeImageFile(object);
+      } else if (object.name?.match(/comics\/(.+?)\/episodes\/(.+?)\/pages\/(.+?)\/image\/(.+)/g)) {
+        await container.resolve(ComicController).onUploadPageImageFile(object);
       }
     }),
 };

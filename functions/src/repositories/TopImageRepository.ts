@@ -3,7 +3,7 @@ import TopImageModel from "../models/TopImageModel";
 
 export default class TopImageRepository extends AbstractRepository<TopImageModel> {
   constructor() {
-    super("topImages");
+    super(["topImages"]);
   }
 
   public async get(): Promise<Array<TopImageModel>> {

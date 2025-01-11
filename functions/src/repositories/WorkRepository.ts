@@ -4,7 +4,7 @@ import WorkGetListCondition from "../schemas/WorkGetListCondition";
 
 export default class WorkRepository extends AbstractRepository<WorkModel> {
   constructor() {
-    super("works");
+    super(["works"]);
   }
 
   public async get(condition: WorkGetListCondition): Promise<Array<WorkModel>> {

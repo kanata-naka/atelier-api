@@ -5,7 +5,7 @@ import TagInfoModel from "../models/TagInfoModel";
 
 export default class TagInfoRepository extends AbstractRepository<TagInfoModel> {
   constructor() {
-    super("tagInfo");
+    super(["tagInfo"]);
   }
 
   public async aggregateById(id: string) {

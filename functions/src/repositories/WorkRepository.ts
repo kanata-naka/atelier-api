@@ -8,9 +8,15 @@ export default class WorkRepository extends AbstractRepository<WorkModel> {
   }
 
   public async get(condition: WorkGetListCondition): Promise<Array<WorkModel>> {
-    let query = this.collectionRef.orderBy(condition.sort?.column || "createdAt", condition.sort?.order || "desc");
+    let query = this.collectionRef.orderBy("createdAt", "desc");
+    if (condition.tag) {
+      query = query.where("tags", "array-contains", condition.tag);
+    }
     if (condition.restrict) {
       query = query.where("restrict", "in", condition.restrict);
+    }
+    if (condition.lastId) {
+      query = query.startAfter(await this.collectionRef.doc(condition.lastId).get());
     }
     if (condition.limit) {
       query = query.limit(condition.limit);

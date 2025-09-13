@@ -3,10 +3,11 @@ import { Nullable, Restrict } from "../types";
 export interface WorkCreateRequest {
   id: string;
   title: string;
-  publishedDate: number;
+  tags: string[];
   images: WorkCreateRequest.Image[];
   description: Nullable<string>;
   restrict: Restrict;
+  createdAt?: number;
 }
 
 export namespace WorkCreateRequest {

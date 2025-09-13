@@ -3,7 +3,7 @@ import { Nullable, Restrict } from "../types";
 
 export interface WorkModel extends BaseModel {
   title: string;
-  publishedDate: FirebaseFirestore.Timestamp;
+  tags: string[];
   images: WorkModel.Image[];
   description: Nullable<string>;
   restrict: Restrict;

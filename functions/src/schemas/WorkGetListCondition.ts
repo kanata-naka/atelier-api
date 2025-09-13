@@ -1,10 +1,8 @@
 import { Restrict } from "../types";
 
 export default interface WorkGetListCondition {
+  tag?: string;
   restrict?: Restrict[];
+  lastId?: string;
   limit?: number;
-  sort?: {
-    column?: "publishedDate" | "createdAt";
-    order?: FirebaseFirestore.OrderByDirection;
-  };
 }

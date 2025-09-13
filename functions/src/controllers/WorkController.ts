@@ -24,8 +24,10 @@ export default class WorkController extends AbstractController {
 
   public async get(data: WorkGetRequest): Promise<WorkGetListResponse> {
     const models: Array<WorkModel> = await this.workRepository.get(data);
+    const result = await Promise.all(models.map(async (model) => await this.createWorkGetResponse(model)));
     return {
-      result: await Promise.all(models.map(async (model) => await this.createWorkGetResponse(model))),
+      result,
+      fetchedAll: data && data.limit ? result.length < data.limit : false,
     };
   }
 
@@ -38,7 +40,7 @@ export default class WorkController extends AbstractController {
     return {
       id: model.id!,
       title: model.title,
-      publishedDate: model.publishedDate.seconds,
+      tags: model.tags,
       images: await Promise.all(
         model.images.map(async (image) => {
           return {
@@ -64,7 +66,7 @@ export default class WorkController extends AbstractController {
   public async create(data: WorkCreateRequest): Promise<void> {
     const model: WorkModel = {
       ...data,
-      publishedDate: this.workRepository.createTimestamp(data.publishedDate),
+      createdAt: data.createdAt ? this.workRepository.createTimestamp(data.createdAt) : undefined,
     };
     await this.workRepository.create(model);
   }
@@ -72,7 +74,7 @@ export default class WorkController extends AbstractController {
   public async update(data: WorkUpdateRequest): Promise<void> {
     const model: WorkModel = {
       ...data,
-      publishedDate: this.workRepository.createTimestamp(data.publishedDate),
+      createdAt: data.createdAt ? this.workRepository.createTimestamp(data.createdAt) : undefined,
     };
     await this.workRepository.update(model);
   }

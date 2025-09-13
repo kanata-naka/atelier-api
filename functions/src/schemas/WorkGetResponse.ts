@@ -3,7 +3,7 @@ import { Nullable, Restrict } from "../types";
 export interface WorkGetResponse {
   id: string;
   title: string;
-  publishedDate: number;
+  tags: string[];
   images: WorkGetResponse.Image[];
   description: Nullable<string>;
   restrict: Restrict;

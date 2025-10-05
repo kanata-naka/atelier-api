@@ -1,6 +1,7 @@
 import * as admin from "firebase-admin";
 import { FieldValue } from "firebase-admin/firestore";
 import AbstractRepository from "./AbstractRepository";
+import { Restrict } from "../constants";
 import TagInfoModel from "../models/TagInfoModel";
 
 export default class TagInfoRepository extends AbstractRepository<TagInfoModel> {
@@ -10,7 +11,13 @@ export default class TagInfoRepository extends AbstractRepository<TagInfoModel> 
 
   public async aggregateById(id: string) {
     // 全件取得してタグを集計する
-    const snapshot = await admin.firestore().collection(id).orderBy("createdAt", "desc").select("tags").get();
+    const snapshot = await admin
+      .firestore()
+      .collection(id)
+      .orderBy("createdAt", "desc")
+      .where("restrict", "!=", Restrict.PRIVATE)
+      .select("tags")
+      .get();
     const info: TagInfoModel.TagInfo[] = [];
     snapshot.docs.map((documentSnapshot) => {
       const tagNames: string[] = [...documentSnapshot.data().tags];
